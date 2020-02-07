@@ -61,7 +61,9 @@ typedef struct
 }	INVNODE;
 
 IMP_ITEM_CHOICE_TYPE gIMPItemChoices[MAX_IMP_ITEM_TYPES];
-	
+
+void GiveIMPRandomItemsForNewSkillTrait( MERCPROFILESTRUCT* pProfile, NTrait skillTrait, UINT8 normalTypeIndex, UINT8 expertTypeIndex = 0 );
+void GiveIMPRandomItemsForOldSkillTrait( MERCPROFILESTRUCT* pProfile, OTrait skillTrait, UINT8 normalTypeIndex, UINT8 expertTypeIndex = 0 );
 void GiveIMPRandomItems( MERCPROFILESTRUCT *pProfile, UINT8 typeIndex );
 void GiveIMPItems( MERCPROFILESTRUCT *pProfile, INT8 abilityValue, UINT8 typeIndex );
 
@@ -444,11 +446,6 @@ void BtnIMPConfirmNo( GUI_BUTTON *btn,INT32 reason )
 }
 */
 
-// SANDRO - improved this function
-//#define PROFILE_HAS_SKILL_TRAIT( p, t ) ( gGameOptions.fNewTraitSystem ? ((p->bSkillTrait == t) || (p->bSkillTrait2 == t) || (p->bSkillTrait3 == t)) : ((p->bSkillTrait == t) || (p->bSkillTrait2 == t)))
-#define PROFILE_HAS_SKILL_TRAIT( p, t ) ( ProfileHasSkillTrait( p, t ) > 0 )
-// DBrot: need a check for experts
-#define PROFILE_HAS_EXPERT_TRAIT( p, t ) ( ProfileHasSkillTrait( p, t ) > 1 )
 //CHRISL: New function to handle proper distribution of starting gear
 void DistributeInitialGear(MERCPROFILESTRUCT *pProfile)
 {
@@ -637,319 +634,179 @@ void GiveItemsToPC( UINT8 ubProfileId )
 		if ( gGameOptions.fNewTraitSystem )
 		{
 			// MAJOR TRAITS
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AUTO_WEAPONS_NT))
-			{	
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, AUTO_WEAPONS_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_AUTO_WEAPONS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_AUTO_WEAPONS);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, HEAVY_WEAPONS_NT ))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, HEAVY_WEAPONS_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_HEAVY_WEAPONS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_HEAVY_WEAPONS);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, SNIPER_NT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, SNIPER_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_SNIPER_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_SNIPER);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, RANGER_NT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, RANGER_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_RANGER_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_RANGER);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, GUNSLINGER_NT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, GUNSLINGER_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_GUNSLINGER_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_GUNSLINGER);
-				}		
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, MARTIAL_ARTS_NT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, MARTIAL_ARTS_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_MARTIAL_ARTS);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, SQUADLEADER_NT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, SQUADLEADER_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_SQUADLEADER_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_SQUADLEADER);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, TECHNICIAN_NT) && ( iMechanical ) )
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, TECHNICIAN_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_TECHNICIAN_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_TECHNICIAN);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, DOCTOR_NT ))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, DOCTOR_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_DOCTOR_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_DOCTOR);
-				}
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, COVERT_NT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, COVERT_NT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_COVERT_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_COVERT);
-				}
-			}
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				AUTO_WEAPONS_NT,
+				IMP_AUTO_WEAPONS,
+				IMP_AUTO_WEAPONS_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				SNIPER_NT,
+				IMP_SNIPER,
+				IMP_SNIPER_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				RANGER_NT,
+				IMP_RANGER,
+				IMP_RANGER_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				AUTO_WEAPONS_NT,
+				IMP_AUTO_WEAPONS,
+				IMP_AUTO_WEAPONS_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				GUNSLINGER_NT,
+				IMP_GUNSLINGER,
+				IMP_GUNSLINGER_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				MARTIAL_ARTS_NT,
+				IMP_MARTIAL_ARTS,
+				IMP_MARTIAL_ARTS_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				SQUADLEADER_NT,
+				IMP_SQUADLEADER,
+				IMP_SQUADLEADER_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				TECHNICIAN_NT,
+				IMP_TECHNICIAN,
+				IMP_TECHNICIAN_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				DOCTOR_NT,
+				IMP_DOCTOR,
+				IMP_DOCTOR_EXP
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				COVERT_NT,
+				IMP_COVERT,
+				IMP_COVERT_EXP
+			);
+
 			// MINOR TRAITS
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AMBIDEXTROUS_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, MELEE_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_MELEE);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, THROWING_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_THROWING);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, NIGHT_OPS_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_NIGHT_OPS);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, STEALTHY_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_STEALTHY);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, ATHLETICS_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_ATHLETICS);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, BODYBUILDING_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_BODYBUILDING);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, DEMOLITIONS_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_DEMOLITIONS);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, TEACHING_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_TEACHING);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, SCOUTING_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_SCOUTING);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, RADIO_OPERATOR_NT))
-			{
-				GiveIMPRandomItems(pProfile,IMP_RADIO_OPERATOR);
-			}
-			if ( PROFILE_HAS_SKILL_TRAIT( ubProfileId, SURVIVAL_NT ) )
-			{
-				GiveIMPRandomItems( pProfile, IMP_SURVIVAL );
-			}
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				AMBIDEXTROUS_NT,
+				IMP_AMBIDEXTROUS
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				MELEE_NT,
+				IMP_MELEE
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				THROWING_NT,
+				IMP_THROWING
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				NIGHT_OPS_NT,
+				IMP_NIGHT_OPS
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				STEALTHY_NT,
+				IMP_STEALTHY
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				ATHLETICS_NT,
+				IMP_ATHLETICS
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				BODYBUILDING_NT,
+				IMP_BODYBUILDING
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				DEMOLITIONS_NT,
+				IMP_DEMOLITIONS
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				TEACHING_NT,
+				IMP_TEACHING
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				SCOUTING_NT,
+				IMP_SCOUTING
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				RADIO_OPERATOR_NT,
+				IMP_RADIO_OPERATOR
+			);
+			GiveIMPRandomItemsForNewSkillTrait( pProfile,
+				SURVIVAL_NT,
+				IMP_SURVIVAL
+			);
 		}
 		else
 		{
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, LOCKPICKING_OT) && ( iMechanical ) )
+			if ( iMechanical )
 			{
-				//MakeProfileInvItemAnySlot(pProfile, LOCKSMITHKIT, 100, 1);
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, LOCKPICKING_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_LOCKPICKING_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_LOCKPICKING);
-				}
+				GiveIMPRandomItemsForOldSkillTrait( pProfile,
+					LOCKPICKING_OT,
+					IMP_LOCKPICKING,
+					IMP_LOCKPICKING_EXP
+				);
+				GiveIMPRandomItemsForOldSkillTrait( pProfile,
+					ELECTRONICS_OT,
+					IMP_ELECTRONICS
+				);
 			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, ELECTRONICS_OT) && ( iMechanical ) )
-			{
-				//MakeProfileInvItemAnySlot(pProfile, METALDETECTOR, 100, 1);
-				GiveIMPRandomItems(pProfile,IMP_ELECTRONICS);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, CAMOUFLAGED_OT)) // TODO: Madd - other camouflage types, once we figure out a way to enable more traits
-			{
-				//MakeProfileInvItemAnySlot(pProfile, CAMOUFLAGEKIT, 100, 1);
-				GiveIMPRandomItems(pProfile,IMP_CAMOUFLAGED);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AMBIDEXT_OT))
-			{
-				//MakeProfileInvItemAnySlot(pProfile, M950, 100, 1);
-				GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
-			}
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, NIGHTOPS_OT))
-			{
-	//			MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 2);
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, NIGHTOPS_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_NIGHT_OPS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_NIGHT_OPS);
-				}
-			}
-		
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, HANDTOHAND_OT))
-			{
-				//MakeProfileInvItemAnySlot(pProfile, BRASS_KNUCKLES, 100, 1);
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, HANDTOHAND_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_MARTIAL_ARTS);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, THROWING_OT))
-			{
-	//			MakeProfileInvItemAnySlot(pProfile, THROWING_KNIFE, 100, 1);
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, THROWING_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_THROWING_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_THROWING);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, STEALTHY_OT))
-			{
-	//			MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 1);
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, STEALTHY_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_STEALTHY_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_STEALTHY);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, KNIFING_OT))
-			{
-	//			MakeProfileInvItemAnySlot(pProfile, COMBAT_KNIFE, 100, 1);
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, KNIFING_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_MELEE_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_MELEE);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, MARTIALARTS_OT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, MARTIALARTS_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_MARTIAL_ARTS);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, PROF_SNIPER_OT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, PROF_SNIPER_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_SNIPER_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_SNIPER);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, TEACHING_OT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, TEACHING_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_TEACHING_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_TEACHING);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AUTO_WEAPS_OT))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, AUTO_WEAPS_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_AUTO_WEAPONS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_AUTO_WEAPONS);
-				}
-			}
-
-			if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, HEAVY_WEAPS_OT ))
-			{
-				if( gGameExternalOptions.fExpertsGetDifferentChoices && PROFILE_HAS_EXPERT_TRAIT(ubProfileId, HEAVY_WEAPS_OT))
-				{
- 					GiveIMPRandomItems(pProfile,IMP_HEAVY_WEAPONS_EXP);
-				}
-				else
-				{
-					GiveIMPRandomItems(pProfile, IMP_HEAVY_WEAPONS);
-				}
-			}
+			GiveIMPRandomItemsForOldSkillTrait( pProfile, // TODO: Madd - other camouflage types, once we figure out a way to enable more traits
+				CAMOUFLAGED_OT,
+				IMP_CAMOUFLAGED
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				AMBIDEXT_OT,
+				IMP_AMBIDEXTROUS
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				NIGHTOPS_OT,
+				IMP_NIGHT_OPS,
+				IMP_NIGHT_OPS_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				HANDTOHAND_OT,
+				IMP_MARTIAL_ARTS,
+				IMP_MARTIAL_ARTS_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				THROWING_OT,
+				IMP_THROWING,
+				IMP_THROWING_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				STEALTHY_OT,
+				IMP_STEALTHY,
+				IMP_STEALTHY_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				KNIFING_OT,
+				IMP_MELEE,
+				IMP_MELEE_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				MARTIALARTS_OT,
+				IMP_MARTIAL_ARTS,
+				IMP_MARTIAL_ARTS_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				PROF_SNIPER_OT,
+				IMP_SNIPER,
+				IMP_SNIPER_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				TEACHING_OT,
+				IMP_TEACHING,
+				IMP_TEACHING_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				AUTO_WEAPS_OT,
+				IMP_AUTO_WEAPONS,
+				IMP_AUTO_WEAPONS_EXP
+			);
+			GiveIMPRandomItemsForOldSkillTrait( pProfile,
+				HEAVY_WEAPS_OT,
+				IMP_HEAVY_WEAPONS,
+				IMP_HEAVY_WEAPONS_EXP
+			);
 		}
 		/////////////////////////////////////////////////////////////////////
 	}
@@ -1640,6 +1497,29 @@ void ResetIMPCharactersEyesAndMouthOffsets( UINT8 ubMercProfileID )
 	gMercProfiles[ubMercProfileID].usMouthY = gIMPValues[gMercProfiles[ubMercProfileID].ubFaceIndex].uiMouthYPositions;
 }
 
+void GiveIMPRandomItemsForSkillLevel( MERCPROFILESTRUCT* pProfile, INT8 skillLevel, UINT8 normalTypeIndex, UINT8 expertTypeIndex )
+{
+	if ( expertTypeIndex > 0 && gGameExternalOptions.fExpertsGetDifferentChoices && skillLevel >= 2 )
+	{
+		GiveIMPRandomItems( pProfile, expertTypeIndex );
+	}
+	else if ( skillLevel >= 1 )
+	{
+		GiveIMPRandomItems( pProfile, normalTypeIndex );
+	}
+}
+
+void GiveIMPRandomItemsForNewSkillTrait( MERCPROFILESTRUCT* pProfile, NTrait skillTrait, UINT8 normalTypeIndex, UINT8 expertTypeIndex )
+{
+	INT8 skillLevel = pProfile->traits.ProfileNTraitLevel( skillTrait );
+	GiveIMPRandomItemsForSkillLevel( pProfile, skillLevel, normalTypeIndex, expertTypeIndex );
+}
+
+void GiveIMPRandomItemsForOldSkillTrait( MERCPROFILESTRUCT* pProfile, OTrait skillTrait, UINT8 normalTypeIndex, UINT8 expertTypeIndex )
+{
+	INT8 skillLevel = pProfile->traits.ProfileOTraitLevel( skillTrait );
+	GiveIMPRandomItemsForSkillLevel( pProfile, skillLevel, normalTypeIndex, expertTypeIndex );
+}
 
 void GiveIMPRandomItems( MERCPROFILESTRUCT *pProfile, UINT8 typeIndex )
 {

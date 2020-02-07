@@ -4651,26 +4651,27 @@ BOOLEAN AssignTraitsToSoldier( SOLDIERTYPE *pSoldier, SOLDIERCREATE_STRUCT *pCre
 
 		if ( type > -1 )
 		{
-			if ( zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[0] > 0 )
+			SOLDIER_PROFILE_VALUES* pValues = &zSoldierProfile[type][pSoldier->usSoldierProfile];
+			if ( pValues->uiTrait[0] > 0 )
 			{
-				pSoldier->stats.ubSkillTraits[0] = zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[0];
+				pSoldier->stats.ubSkillTraits[0] = pValues->uiTrait[0];
 				ATraitAssigned = TRUE;
 			}
 
-			if ( zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[1] > 0 )
+			if ( pValues->uiTrait[1] > 0 )
 			{
-				pSoldier->stats.ubSkillTraits[1] = zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[1];
+				pSoldier->stats.ubSkillTraits[1] = pValues->uiTrait[1];
 				BTraitAssigned = TRUE;
 			}
 
-			if ( zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[2] > 0 )
+			if ( pValues->uiTrait[2] > 0 )
 			{
 				// we have to make sure that not all 3 traits are major traits - if that happens, we ignore the third one
-				if ( MajorTrait( pSoldier->stats.ubSkillTraits[0] ) && MajorTrait( pSoldier->stats.ubSkillTraits[1] ) && MajorTrait( zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[2] ) )
+				if ( HasMajorNTrait( (NTrait)(pSoldier->stats.ubSkillTraits[0]) ) && HasMajorNTrait( (NTrait)(pSoldier->stats.ubSkillTraits[1]) ) && HasMajorNTrait( (NTrait)(pValues->uiTrait[2]) ) )
 					;
 				else
 				{
-					pSoldier->stats.ubSkillTraits[2] = zSoldierProfile[type][pSoldier->usSoldierProfile].uiTrait[2];
+					pSoldier->stats.ubSkillTraits[2] = pValues->uiTrait[2];
 					CTraitAssigned = TRUE;
 				}
 			}

@@ -1820,6 +1820,7 @@ void DisplayCharStats( INT32 iId, INT32 iSlot )
 
 				   if ( !fAmIaRobot )
 				   {
+					   MERCPROFILESTRUCT *pProfile = &gMercProfiles[Menptr[iId].ubProfile];
 					   if ( gGameOptions.fNewTraitSystem ) // SANDRO - old/new traits check
 					   {
 						   UINT8 ubTempSkillArray[30];
@@ -1829,12 +1830,12 @@ void DisplayCharStats( INT32 iId, INT32 iSlot )
 						   // we also get the number of lines (skills) to be displayed 
 						   for ( UINT8 ubCnt = 1; ubCnt < NUM_SKILLTRAITS_NT; ubCnt++ )
 						   {
-							   if ( ProfileHasSkillTrait( Menptr[iId].ubProfile, ubCnt ) == 2 )
+							   if ( pProfile->traits.ProfileNTraitLevel( (NTrait)ubCnt ) == 2 )
 							   {
 								   ubTempSkillArray[bNumSkillTraits] = (ubCnt + NEWTRAIT_MERCSKILL_EXPERTOFFSET);
 								   bNumSkillTraits++;
 							   }
-							   else if ( ProfileHasSkillTrait( Menptr[iId].ubProfile, ubCnt ) == 1 )
+							   else if ( pProfile->traits.ProfileNTraitLevel( (NTrait)ubCnt ) == 1 )
 							   {
 								   ubTempSkillArray[bNumSkillTraits] = ubCnt;
 								   bNumSkillTraits++;
@@ -1976,8 +1977,8 @@ void DisplayCharStats( INT32 iId, INT32 iSlot )
 					   else
 					   {
 						   INT8 bSkill1 = 0, bSkill2 = 0;
-						   bSkill1 = gMercProfiles[Menptr[iId].ubProfile].bSkillTraits[0];
-						   bSkill2 = gMercProfiles[Menptr[iId].ubProfile].bSkillTraits[1];
+						   bSkill1 = pProfile->bSkillTraits[0];
+						   bSkill2 = pProfile->bSkillTraits[1];
 
 						   //if the 2 skills are the same, add the '(expert)' at the end
 						   if ( bSkill1 == bSkill2 && bSkill1 != 0 )
@@ -8763,14 +8764,14 @@ void AssignPersonnelAchievementsHelpText( INT32 ubProfile )
 					wcscat( apStr, atStr );
 					break;
 				case 1: 
-					if ( ProfileHasSkillTrait( ubProfile, DOCTOR_NT ) > 0 )
+					if ( gMercProfiles[ubProfile].traits.ProfileNTraitLevel( DOCTOR_NT ) > 0 )
 					{
 						swprintf(atStr, pPersonnelRecordsHelpTexts[ 26 ], gMercProfiles[ubProfile].records.usSurgeriesMade );
 						wcscat( apStr, atStr );
 					}
 					break;
 				case 2: 
-					if ( ProfileHasSkillTrait( ubProfile, DOCTOR_NT ) > 1 )
+					if ( gMercProfiles[ubProfile].traits.ProfileNTraitLevel( DOCTOR_NT ) > 1 )
 					{
 						swprintf(atStr, pPersonnelRecordsHelpTexts[ 26 ], gMercProfiles[ubProfile].records.usSurgeriesMade );
 						wcscat( apStr, atStr );
@@ -8798,7 +8799,7 @@ void AssignPersonnelAchievementsHelpText( INT32 ubProfile )
 	}
 	if (gMercProfiles[ubProfile].records.usAmbushesExperienced > 0 || fShowRecordsIfZero)
 	{
-		if ( gGameOptions.fNewTraitSystem && ( ProfileHasSkillTrait( ubProfile, SCOUTING_NT ) > 0 ) )
+		if ( gGameOptions.fNewTraitSystem && ( gMercProfiles[ubProfile].traits.ProfileNTraitLevel( SCOUTING_NT ) > 0 ) )
 		{
 			swprintf(atStr, pPersonnelRecordsHelpTexts[ 29 ], gMercProfiles[ubProfile].records.usAmbushesExperienced );
 			wcscat( apStr, atStr );
@@ -8843,7 +8844,7 @@ void AssignPersonnelBattlesHelpText( INT32 ubProfile )
 	}
 	if (gMercProfiles[ubProfile].records.usAmbushesExperienced > 0 || fShowRecordsIfZero)
 	{		
-		if (!( gGameOptions.fNewTraitSystem && ( ProfileHasSkillTrait( ubProfile, SCOUTING_NT ) > 0 ) ))
+		if (!( gGameOptions.fNewTraitSystem && ( gMercProfiles[ubProfile].traits.ProfileNTraitLevel( SCOUTING_NT ) > 0 ) ))
 		{
 			swprintf(atStr, pPersonnelRecordsHelpTexts[ 34 ], gMercProfiles[ubProfile].records.usAmbushesExperienced );
 			wcscat( apStr, atStr );

@@ -661,7 +661,7 @@ fFirstTimeInMapScreen = TRUE;
 		{
 			for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
 			{
-				if ( ProfileHasSkillTrait( uiLoop, CAMOUFLAGED_OT ) > 0 )
+				if ( gMercProfiles[uiLoop].traits.ProfileOTraitLevel( CAMOUFLAGED_OT ) > 0 )
 				{
 					gCamoFace[uiLoop].gCamoface = TRUE;
 				}									
@@ -1114,7 +1114,7 @@ void ReStartingGame()
 		{
 			for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
 			{
-				if ( ProfileHasSkillTrait( uiLoop, CAMOUFLAGED_OT ) > 0 )
+				if ( gMercProfiles[uiLoop].traits.ProfileOTraitLevel( CAMOUFLAGED_OT ) > 0 )
 					{
 						gCamoFace[uiLoop].gCamoface = TRUE;
 					}

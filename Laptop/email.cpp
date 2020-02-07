@@ -4454,138 +4454,139 @@ void HandleIMPCharProfileResultsMessage( void)
 			iCounter++;
 		}
 
+	MERCPROFILESTRUCT* pProfile = &gMercProfiles[iCurrentIMPSlot];
 	///////////////////////////////////////////////////////////////////////////////
 	// SANDRO - switch for old/new traits
 	if ( gGameOptions.fNewTraitSystem )
 	{
 		// Auto Weapons
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, AUTO_WEAPONS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( AUTO_WEAPONS_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AUTO ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Heavy Weapons
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, HEAVY_WEAPONS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( HEAVY_WEAPONS_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_HEAVY ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Sniper
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, SNIPER_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( SNIPER_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[0]);
 			AddEmailRecordToList( pString );
 		}
 		// Ranger
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, RANGER_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( RANGER_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[2]);
 			AddEmailRecordToList( pString );
 		}
 		// Gunslinger
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, GUNSLINGER_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( GUNSLINGER_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[3]);
 			AddEmailRecordToList( pString );
 		}
 		// Martial Artist
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, MARTIAL_ARTS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( MARTIAL_ARTS_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_MARTIAL ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Squadleader
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, SQUADLEADER_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( SQUADLEADER_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[4]);
 			AddEmailRecordToList( pString );
 		}
 		// Technician
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, TECHNICIAN_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( TECHNICIAN_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[5]);
 			AddEmailRecordToList( pString );
 		}
 		// Doctor
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, DOCTOR_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( DOCTOR_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[6]);
 			AddEmailRecordToList( pString );
 		}
 		// Ambidextrous
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, AMBIDEXTROUS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( AMBIDEXTROUS_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AMBI ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Melee
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, MELEE_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( MELEE_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_KNIFE ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Throwing
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, THROWING_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( THROWING_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_THROW ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Night Ops
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, NIGHT_OPS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( NIGHT_OPS_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_NIGHT ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Stealthy
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, STEALTHY_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( STEALTHY_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_STEALTH ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Athletics
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, ATHLETICS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( ATHLETICS_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[7]);
 			AddEmailRecordToList( pString );
 		}
 		// Bodybuilding
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, BODYBUILDING_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( BODYBUILDING_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[8]);
 			AddEmailRecordToList( pString );
 		}
 		// Demolitions
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, DEMOLITIONS_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( DEMOLITIONS_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[9]);
 			AddEmailRecordToList( pString );
 		}
 		// Teaching
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, TEACHING_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( TEACHING_NT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_TEACH ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Scouting
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, SCOUTING_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( SCOUTING_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[10]);
 			AddEmailRecordToList( pString );
 		}
 		// Covert ops
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, COVERT_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( COVERT_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[11]);
 			AddEmailRecordToList( pString );
 		}
 		// Radio Operator
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, RADIO_OPERATOR_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( RADIO_OPERATOR_NT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[12]);
 			AddEmailRecordToList( pString );
 		}
 		// Survival
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, SURVIVAL_NT ) > 0 )
+		if ( pProfile->traits.ProfileNTraitLevel( SURVIVAL_NT ) > 0 )
 		{
 			wcscpy( pString, MissingIMPSkillsDescriptions[13] );
 			AddEmailRecordToList( pString );
@@ -4594,61 +4595,61 @@ void HandleIMPCharProfileResultsMessage( void)
 	else
 	{
 		// Lockpick
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, LOCKPICKING_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( LOCKPICKING_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_LOCK ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Hand to Hand
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, HANDTOHAND_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( HANDTOHAND_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_HAND ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Electronics
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, ELECTRONICS_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( ELECTRONICS_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_ELEC ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Night Ops
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, NIGHTOPS_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( NIGHTOPS_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_NIGHT ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Throwing
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, THROWING_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( THROWING_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_THROW ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Teaching
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, TEACHING_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( TEACHING_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_TEACH ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Heavy Weapons
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, HEAVY_WEAPS_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( HEAVY_WEAPS_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_HEAVY ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Auto Weapons
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, AUTO_WEAPS_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( AUTO_WEAPS_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AUTO ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Stealthy
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, STEALTHY_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( STEALTHY_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_STEALTH ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Ambidextrous
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, AMBIDEXT_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( AMBIDEXT_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AMBI ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
@@ -4660,26 +4661,26 @@ void HandleIMPCharProfileResultsMessage( void)
 			AddEmailRecordToList( pString );
 		}*/
 		// Martial Arts
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, MARTIALARTS_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( MARTIALARTS_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_MARTIAL ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Knifing
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, KNIFING_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( KNIFING_OT ) > 0 )
 		{
 			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_KNIFE ), MAIL_STRING_SIZE );
 			AddEmailRecordToList( pString );
 		}
 		// Sniper
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, PROF_SNIPER_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( PROF_SNIPER_OT ) > 0 )
 		{
 			wcscpy(pString, MissingIMPSkillsDescriptions[0]);
 			// add to list
 			AddEmailRecordToList( pString );
 		}
 		// Camouflage
-		if ( ProfileHasSkillTrait( iCurrentIMPSlot, CAMOUFLAGED_OT ) > 0 )
+		if ( pProfile->traits.ProfileOTraitLevel( CAMOUFLAGED_OT ) > 0 )
 		{
 			if ( gGameExternalOptions.fShowCamouflageFaces == TRUE )
 			{

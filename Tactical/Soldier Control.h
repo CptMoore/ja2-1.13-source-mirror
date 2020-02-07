@@ -20,6 +20,7 @@
 #include <iterator>
 #include "GameSettings.h"	// added by Flugente
 #include "Disease.h"		// added by Flugente
+#include "Traits.h"
 
 #define PTR_CIVILIAN	(pSoldier->bTeam == CIV_TEAM)
 #define PTR_CROUCHED	(gAnimControl[ pSoldier->usAnimState ].ubHeight == ANIM_CROUCH)
@@ -115,11 +116,6 @@ extern UINT16 CivLastNames[MAXCIVLASTNAMES][10];
 #define	SOLDIER_TRAIT_MARTIALARTS		0x0800
 #define	SOLDIER_TRAIT_KNIFING				0x1000
 */
-// SANDRO was here, messed this..
-//#define HAS_SKILL_TRAIT( s, t ) (s->stats.ubSkillTrait1 == t || s->stats.ubSkillTrait2 == t)
-//#define NUM_SKILL_TRAITS( s, t ) ( (s->stats.ubSkillTrait1 == t) ? ( (s->stats.ubSkillTrait2 == t) ? 2 : 1 ) : ( (s->stats.ubSkillTrait2 == t) ? 1 : 0 ) )
-BOOLEAN HAS_SKILL_TRAIT( SOLDIERTYPE * pSoldier, UINT8 uiSkillTraitNumber );
-INT8 NUM_SKILL_TRAITS( SOLDIERTYPE * pSoldier, UINT8 uiSkillTraitNumber );
 
 #define	SOLDIER_QUOTE_SAID_IN_SHIT										0x0001
 #define	SOLDIER_QUOTE_SAID_LOW_BREATH									0x0002
@@ -1016,7 +1012,7 @@ public:
 	INT8												bExplosive;
 	INT8												bMedical;
 	INT8												bScientific;	
-	UINT8												ubSkillTraits[30];
+	UINT8												ubSkillTraits[ MAX_NUM_TRAITS ];
 	//UINT8												ubSkillTrait2;
 	//UINT8												ubSkillTrait3; // added by SANDRO
 };
@@ -1605,6 +1601,9 @@ public:
 	INT32 sPlotSrcGrid;
 	//std::vector<UINT32>	CTH;
 
+	// move some traits logic to own class, composition to help with clutter
+	SoldierTraits traits;
+
 	// sevenfm: remember suppression points, shock from last attack
 	// these counters are used only for showing suppression values above soldier (similar to damage counter)
 	// these values are not saved
@@ -1760,9 +1759,6 @@ public:
 	SOLDIERTYPE *GetRobotController( void );
 	BOOLEAN CanRobotBeControlled( void );
 	BOOLEAN ControllingRobot( void );
-
-
-
 
 	BOOLEAN SoldierReadyWeapon( INT16 sTargetXPos, INT16 sTargetYPos, BOOLEAN fEndReady, BOOLEAN fRaiseToHipOnly );
 	BOOLEAN SoldierReadyWeapon( void );
@@ -2144,8 +2140,6 @@ BOOLEAN AIDecideHipOrShoulderStance( SOLDIERTYPE * pSoldier, INT32 iGridNo );
 BOOLEAN DecideAltAnimForBigMerc( SOLDIERTYPE * pSoldier );
 
 // added by Flugente
-BOOLEAN TwoStagedTrait( UINT8 uiSkillTraitNumber );						// determine if this (new) trait has two stages
-BOOLEAN MajorTrait( UINT8 uiSkillTraitNumber );							// determine if this is a major trait
 BOOLEAN GetRadioOperatorSignal(UINT8 usOwner, INT32* psTargetGridNo);	// retrieve the gridno of a radio operator who (or whose team) ordered an artillery strike
 BOOLEAN IsValidArtilleryOrderSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 bTeam );		// can an artillery strike be ordered FROM this sector
 BOOLEAN SectorJammed();

@@ -1315,18 +1315,13 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 		{
 			sChance += 1;
 		}
-		if ( ProfileHasSkillTrait( iProfileID, SQUADLEADER_NT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, SQUADLEADER_NT );
-		if ( ProfileHasSkillTrait( iProfileID, TECHNICIAN_NT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, TECHNICIAN_NT );
-		if ( ProfileHasSkillTrait( iProfileID, DOCTOR_NT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, DOCTOR_NT );
-		if ( ProfileHasSkillTrait( iProfileID, STEALTHY_NT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, STEALTHY_NT );
-		if ( ProfileHasSkillTrait( iProfileID, BODYBUILDING_NT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, BODYBUILDING_NT );
-		if ( ProfileHasSkillTrait( iProfileID, SCOUTING_NT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, SCOUTING_NT );
+		
+		sChance -= pProfile->traits.ProfileNTraitLevel( SQUADLEADER_NT );
+		sChance -= pProfile->traits.ProfileNTraitLevel( TECHNICIAN_NT );
+		sChance -= pProfile->traits.ProfileNTraitLevel( DOCTOR_NT );
+		sChance -= pProfile->traits.ProfileNTraitLevel( STEALTHY_NT );
+		sChance -= pProfile->traits.ProfileNTraitLevel( BODYBUILDING_NT );
+		sChance -= pProfile->traits.ProfileNTraitLevel( SCOUTING_NT );
 	}
 	else
 	{		
@@ -1340,8 +1335,7 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 				break;
 		}
 		// stealthy guys are slightly less likely to get killed (they're careful)
-		if ( ProfileHasSkillTrait( iProfileID, STEALTHY_OT ) > 0 )
-			sChance -= ProfileHasSkillTrait( iProfileID, STEALTHY_OT );
+		sChance -= pProfile->traits.ProfileOTraitLevel( STEALTHY_OT );
 	}
 
 	if ((INT16) PreRandom(1000) < sChance)

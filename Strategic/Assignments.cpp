@@ -2727,7 +2727,7 @@ BOOLEAN CanCharacterSnitch( SOLDIERTYPE *pSoldier )
 		return( FALSE );
 
 	// has character a snitch trait
-	if( ProfileHasSkillTrait( pSoldier->ubProfile, SNITCH_NT ) )
+	if( gMercProfiles[pSoldier->ubProfile].traits.ProfileNTraitLevel( SNITCH_NT ) )
 	{
 		return( TRUE );
 	}

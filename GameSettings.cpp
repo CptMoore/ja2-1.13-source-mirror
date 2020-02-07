@@ -2292,10 +2292,10 @@ void LoadSkillTraitsExternalSettings()
 {
 	CIniReader iniReader(STOMP_SETTINGS_FILE);
 
-	gSkillTraitValues.ubMaxNumberOfTraits = iniReader.ReadInteger("Generic Traits Settings","MAX_NUMBER_OF_TRAITS", 5, 2, 30);
+	gSkillTraitValues.ubMaxNumberOfTraits = iniReader.ReadInteger("Generic Traits Settings","MAX_NUMBER_OF_TRAITS", 5, 2, MAX_NUM_TRAITS);
 	gSkillTraitValues.ubNumberOfMajorTraitsAllowed = iniReader.ReadInteger( "Generic Traits Settings", "NUMBER_OF_MAJOR_TRAITS_ALLOWED", 3, 2, gSkillTraitValues.ubMaxNumberOfTraits - 1);
 
-	gSkillTraitValues.ubMaxNumberOfTraitsForIMP = iniReader.ReadInteger("Generic Traits Settings","MAX_NUMBER_OF_TRAITS_FOR_IMP", 3, 2, 30);
+	gSkillTraitValues.ubMaxNumberOfTraitsForIMP = iniReader.ReadInteger("Generic Traits Settings","MAX_NUMBER_OF_TRAITS_FOR_IMP", 3, 2, MAX_NUM_TRAITS);
 	gSkillTraitValues.ubNumberOfMajorTraitsAllowedForIMP = iniReader.ReadInteger( "Generic Traits Settings", "NUMBER_OF_MAJOR_TRAITS_ALLOWED_FOR_IMP", 2, 2, min( gSkillTraitValues.ubNumberOfMajorTraitsAllowed, gSkillTraitValues.ubMaxNumberOfTraitsForIMP - 1 ) );
 
 	// Allow an exception in number of traits for Special Merc?
@@ -2372,8 +2372,8 @@ void LoadSkillTraitsExternalSettings()
 	gSkillTraitValues.ubSNDamageBonusFromNumClicks = iniReader.ReadInteger("Sniper","GUN_DAMAGE_BONUS_FROM_NUM_CLICKS", 4, 0, 8);
 	gSkillTraitValues.ubSNChamberRoundAPsReduction = iniReader.ReadInteger("Sniper","CHAMBER_ROUND_APS_REDUCTION", 25, 0, 45);
 	gSkillTraitValues.ubSNAimClicksAdded = iniReader.ReadInteger("Sniper","POSSIBLE_AIM_CLICK_ADDED_RIFLES", 1, 0, 3);
-	gSkillTraitValues.ubSNFocusRadius = iniReader.ReadInteger( "Sniper", "FOCUS_SKILL_RADIUS", 5, 1, 30 );
-	gSkillTraitValues.sSNFocusInterruptBonus = iniReader.ReadInteger( "Sniper", "FOCUS_SKILL_INTERRUPT_BONUS", 2, 1, 10 );
+	gSkillTraitValues.ubSNFocusRadius = iniReader.ReadInteger("Sniper","FOCUS_SKILL_RADIUS", 5, 1, 30);
+	gSkillTraitValues.sSNFocusInterruptBonus = iniReader.ReadInteger("Sniper","FOCUS_SKILL_INTERRUPT_BONUS", 2, 1, 10);
 
 	// RANGER
 	gSkillTraitValues.ubRABonusCtHRifles = iniReader.ReadInteger("Ranger","BONUS_CTH_RIFLES", 5, 0, 100);

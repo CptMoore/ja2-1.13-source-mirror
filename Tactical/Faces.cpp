@@ -253,14 +253,14 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 		// SANDRO - old/new traits check (I am not sure if this is used at all)
 		if ( gGameOptions.fNewTraitSystem )
 		{
-			if ( ProfileHasSkillTrait( TEX, RANGER_NT ) > 0 )
+			if ( gMercProfiles[TEX].traits.ProfileNTraitLevel( RANGER_NT ) > 0 )
 			{
 				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
 			}
 		}
 		else
 		{
-			if ( ProfileHasSkillTrait( TEX, CAMOUFLAGED_OT ) > 0 )
+			if ( gMercProfiles[TEX].traits.ProfileOTraitLevel( CAMOUFLAGED_OT ) > 0 )
 			{
 				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
 			}
