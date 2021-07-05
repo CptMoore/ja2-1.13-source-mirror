@@ -898,6 +898,7 @@ void DisplayMercMemberClickOnFaceHelpText( UINT8 ubMercID )
 		// clear string value
 		swprintf( sString, L"");
 
+		MERCPROFILESTRUCT *pProfile = &gMercProfiles[ubMercID];
 		if (gGameOptions.fNewTraitSystem) // SANDRO - old/new traits check
 		{
 			UINT8 ubTempSkillArray[30];
@@ -907,12 +908,12 @@ void DisplayMercMemberClickOnFaceHelpText( UINT8 ubMercID )
 			// we also get the number of lines (skills) to be displayed 
 			for ( UINT8 ubCnt = 1; ubCnt < NUM_SKILLTRAITS_NT; ubCnt++ )
 			{
-				if ( ProfileHasSkillTrait( ubMercID, ubCnt ) == 2 )
+				if ( pProfile->traits.ProfileNTraitLevel( (NTrait)ubCnt ) == 2 )
 				{
 					ubTempSkillArray[bNumSkillTraits] = (ubCnt + NEWTRAIT_MERCSKILL_EXPERTOFFSET);
 					bNumSkillTraits++;
 				}
-				else if ( ProfileHasSkillTrait( ubMercID, ubCnt ) == 1 )
+				else if ( pProfile->traits.ProfileNTraitLevel( (NTrait)ubCnt ) == 1 )
 				{
 					ubTempSkillArray[bNumSkillTraits] = ubCnt;
 					bNumSkillTraits++;
@@ -935,8 +936,8 @@ void DisplayMercMemberClickOnFaceHelpText( UINT8 ubMercID )
 		else
 		{
 			INT8 bSkill1 = 0, bSkill2 = 0; 	
-			bSkill1 = gMercProfiles[ ubMercID ].bSkillTraits[0];
-			bSkill2 = gMercProfiles[ ubMercID ].bSkillTraits[1];
+			bSkill1 = pProfile->bSkillTraits[0];
+			bSkill2 = pProfile->bSkillTraits[1];
 
 			if ( bSkill1 == 0 && bSkill2 == 0 )
 			{

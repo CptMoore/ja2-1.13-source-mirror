@@ -1969,73 +1969,7 @@ void UpdateCharRegionHelpText( void )
 			// clear pStr value
 			swprintf( sString, L"");
 
-			if (gGameOptions.fNewTraitSystem) // SANDRO - old/new traits check
-			{
-				UINT8 ubTempSkillArray[30];
-				INT8 bNumSkillTraits = 0;
-
-				// lets rearrange our skills to a temp array
-				// we also get the number of lines (skills) to be displayed 
-				for ( UINT8 ubCnt = 1; ubCnt < NUM_SKILLTRAITS_NT; ++ubCnt )
-				{
-					if ( ProfileHasSkillTrait( pSoldier->ubProfile, ubCnt ) == 2 )
-					{
-						ubTempSkillArray[bNumSkillTraits] = (ubCnt + NEWTRAIT_MERCSKILL_EXPERTOFFSET);
-						++bNumSkillTraits;
-					}
-					else if ( ProfileHasSkillTrait( pSoldier->ubProfile, ubCnt ) == 1 )
-					{
-						ubTempSkillArray[bNumSkillTraits] = ubCnt;
-						++bNumSkillTraits;
-					}
-				}
-
-				if ( bNumSkillTraits == 0 )
-				{
-					swprintf( sString, L"%s", pPersonnelScreenStrings[ PRSNL_TXT_NOSKILLS ] );
-				}
-				else
-				{
-					for ( UINT8 ubCnt = 0; ubCnt < bNumSkillTraits; ubCnt++ )
-					{
-						swprintf( sTemp, L"%s\n", gzMercSkillTextNew[ ubTempSkillArray[ubCnt] ] );
-						wcscat( sString, sTemp );
-					}
-				}
-			}
-			else
-			{
-				INT8 bSkill1 = 0, bSkill2 = 0; 	
-				bSkill1 = gMercProfiles[ pSoldier->ubProfile ].bSkillTraits[0];
-				bSkill2 = gMercProfiles[ pSoldier->ubProfile ].bSkillTraits[1];
-
-				if ( bSkill1 == 0 && bSkill2 == 0 )
-				{
-					swprintf( sString, L"%s", pPersonnelScreenStrings[ PRSNL_TXT_NOSKILLS ] );
-				}
-				else
-				{
-					//if the 2 skills are the same, add the '(expert)' at the end
-					if( bSkill1 == bSkill2 )
-					{
-						swprintf( sString, L"%s %s", gzMercSkillText[bSkill1], gzMercSkillText[EXPERT] );
-					}
-					else
-					{
-						//Display the first skill
-						if( bSkill1 != 0 )
-						{
-							swprintf( sString, L"%s\n", gzMercSkillText[bSkill1] );
-						}
-
-						if( bSkill2 != 0 )
-						{
-							swprintf( sTemp, L"%s", gzMercSkillText[bSkill2] );
-							wcscat( sString, sTemp );
-						}
-					}
-				}
-			}
+			gMercProfiles[pSoldier->ubProfile].traits.FillHelpText( sString );
 			SetRegionFastHelpText( &gCharInfoFaceRegion, sString );
 		}
 		else

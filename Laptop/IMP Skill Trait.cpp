@@ -521,7 +521,7 @@ void HandleIMPSkillTraitAnswers( UINT32 uiSkillPressed, BOOLEAN fSecondTrait )
 			}
 		}
 		// if cannot have expert level of skill, don't continue
-		else if ( gfSkillTraitQuestions2[uiSkillPressed] && !TwoStagedTrait( gGameOptions.fNewTraitSystem ? gusNewMajorTraitRemap[uiSkillPressed] : uiSkillPressed ) )
+		else if ( gfSkillTraitQuestions2[uiSkillPressed] && !( gGameOptions.fNewTraitSystem ? HasMajorNTrait( (NTrait)gusNewMajorTraitRemap[uiSkillPressed] ) : TwoStagedOldImpTrait( uiSkillPressed ) ) )
 		{
 			//dont need to do anything
 			return;
@@ -635,7 +635,7 @@ void HandleIMPSkillTraitAnswers( UINT32 uiSkillPressed, BOOLEAN fSecondTrait )
 			}
 		}
 		// if cannot have expert level of skill, don't continue
-		else if ( gfSkillTraitQuestions[uiSkillPressed] && !TwoStagedTrait( gGameOptions.fNewTraitSystem ? gusNewMajorTraitRemap[uiSkillPressed] : uiSkillPressed ) )
+		else if ( gfSkillTraitQuestions[uiSkillPressed] && !( gGameOptions.fNewTraitSystem ? HasMajorNTrait( (NTrait)gusNewMajorTraitRemap[uiSkillPressed]) : TwoStagedOldImpTrait(uiSkillPressed) ) )
 		{
 			//dont need to do anything
 			return;

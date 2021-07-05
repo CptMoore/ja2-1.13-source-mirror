@@ -1066,7 +1066,8 @@ SOLDIERTYPE::~SOLDIERTYPE( )
 		delete ai_masterplan_;
 }
 
-SOLDIERTYPE::SOLDIERTYPE( ) {
+SOLDIERTYPE::SOLDIERTYPE( ) : traits( this )
+{
 	initialize( );
 }
 
@@ -1271,13 +1272,13 @@ OLD_MERCPROFILESTRUCT_101::OLD_MERCPROFILESTRUCT_101( )
 	memset( this, 0, SIZEOF_OLD_MERCPROFILESTRUCT_101_POD );
 }
 
-MERCPROFILESTRUCT::MERCPROFILESTRUCT( )
+MERCPROFILESTRUCT::MERCPROFILESTRUCT( ) : traits( this )
 {
 	initialize( );
 }
 
 // Copy Constructor
-MERCPROFILESTRUCT::MERCPROFILESTRUCT( const MERCPROFILESTRUCT& src )
+MERCPROFILESTRUCT::MERCPROFILESTRUCT( const MERCPROFILESTRUCT& src ) : traits( this )
 {
 	memcpy( this, &src, SIZEOF_MERCPROFILESTRUCT_POD );
 	inv = src.inv;
@@ -6046,12 +6047,8 @@ void SOLDIERTYPE::EVENT_SoldierGotHit( UINT16 usWeaponIndex, INT16 sDamage, INT1
 					sBreathLoss = sDamage * (100 + gSkillTraitValues.bPercentModifierHtHBreathLoss); // 80% only for untrained mercs
 
 					// martial arts bonus for breath damage
-					if ( HAS_SKILL_TRAIT( MercPtrs[ubAttackerID], MARTIAL_ARTS_NT ) )
-					{
-						sBreathLoss += sDamage * gSkillTraitValues.ubMABonusBreathDamageHandToHand * NUM_SKILL_TRAITS( MercPtrs[ubAttackerID], MARTIAL_ARTS_NT );
-
-						sBreathRegainPenaltyMultiplier += (gSkillTraitValues.usMALostBreathRegainPenalty * NUM_SKILL_TRAITS( MercPtrs[ubAttackerID], MARTIAL_ARTS_NT ));
-					}
+					sBreathLoss += sDamage * MercPtrs[ubAttackerID]->traits.ubMABonusBreathDamageHandToHand();
+					sBreathRegainPenaltyMultiplier += MercPtrs[ubAttackerID]->traits.usMALostBreathRegainPenalty();
 				}
 				else
 				{
@@ -6067,10 +6064,7 @@ void SOLDIERTYPE::EVENT_SoldierGotHit( UINT16 usWeaponIndex, INT16 sDamage, INT1
 				sBreathLoss = sDamage * (100 + gSkillTraitValues.bPercentModifierHtHBreathLoss);
 			}
 			// bodybuilding reduces this to half
-			if ( HAS_SKILL_TRAIT( this, BODYBUILDING_NT ) )
-			{
-				sBreathLoss = max( 10, (sBreathLoss * (100 - gSkillTraitValues.ubBBBreathLossForHtHImpactReduction) / 100) );
-			}
+			sBreathLoss = max( 10, ( sBreathLoss * ( 100 - traits.ubBBBreathLossForHtHImpactReduction() ) / 100 ) );
 		}
 		else
 		{
@@ -7723,8 +7717,8 @@ void EVENT_InternalSetSoldierDesiredDirection( SOLDIERTYPE *pSoldier, UINT8	ubNe
 				break;
 			}
 			// martial artists can turn faster
-			if ( HAS_SKILL_TRAIT( pSoldier, MARTIAL_ARTS_NT ) && gGameOptions.fNewTraitSystem )
-				sAPCost = max( 1, (INT16)(sAPCost * (100 - gSkillTraitValues.ubMAApsTurnAroundReduction * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT )) / 100.0f + 0.5f) );
+			if ( gGameOptions.fNewTraitSystem )
+				sAPCost = max( 1, (INT16)(sAPCost * (100 - pSoldier->traits.ubMAApsTurnAroundReduction()) / 100.0f + 0.5f) );
 
 			// SANDRO: get BP cost for weapon manipulating
 			if ( gGameExternalOptions.ubEnergyCostForWeaponWeight )
@@ -9199,10 +9193,10 @@ void CalculateSoldierAniSpeed( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pStatsSoldier
 		// ATE: If realtime, and stealth mode...
 		if ( pStatsSoldier->bStealthMode )
 		{
-			if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, STEALTHY_NT ) )
+			if ( gGameOptions.fNewTraitSystem )
 			{
 				// Stealthy skill decreases movement speed penalty while on stealthy mode - SANDRO
-				pSoldier->sAniDelay = (INT16)((pSoldier->sAniDelay * (200 - gSkillTraitValues.ubSTStealthModeSpeedBonus)) / 100);
+				pSoldier->sAniDelay = (INT16)((pSoldier->sAniDelay * (200 - pSoldier->traits.ubSTStealthModeSpeedBonus())) / 100);
 			}
 			else // original
 			{
@@ -9213,10 +9207,7 @@ void CalculateSoldierAniSpeed( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pStatsSoldier
 		// SANDRO - STOMP traits - bonus to movement speed for Athletics
 		if ( gGameOptions.fNewTraitSystem && (gAnimControl[pSoldier->usAnimState].uiFlags & ANIM_MOVING) )
 		{
-			if ( HAS_SKILL_TRAIT( pSoldier, ATHLETICS_NT ) )
-			{
-				pSoldier->sAniDelay = (INT16)(pSoldier->sAniDelay * (100 - min( 75, gSkillTraitValues.ubATAPsMovementReduction )) / 100);
-			}
+			pSoldier->sAniDelay = (INT16)( pSoldier->sAniDelay * ( 100 - min( 75, pSoldier->traits.ubATAPsMovementReduction() ) ) / 100 );
 		}
 
 		//pSoldier->sAniDelay = pSoldier->sAniDelay * ( 1 * gTacticalStatus.bRealtimeSpeed / 2 );
@@ -12723,17 +12714,13 @@ void SOLDIERTYPE::EVENT_SoldierBeginPunchAttack( INT32 sGridNo, UINT8 ubDirectio
 	}
 
 	// Are we a martial artist? - SANDRO - added new/old traits check
-	if ( ((NUM_SKILL_TRAITS( this, MARTIAL_ARTS_NT ) >= ((gSkillTraitValues.fPermitExtraAnimationsOnlyToMA) ? 2 : 1)) && gGameOptions.fNewTraitSystem) ||
-		 (HAS_SKILL_TRAIT( this, MARTIALARTS_OT ) && !gGameOptions.fNewTraitSystem) )
-	{
-		fMartialArtist = TRUE;
-	}
+	fMartialArtist = traits.HasMartialArtistSpecialAnimation();
 
 	//Ja25 No meanwhiles
 #ifdef JA2UB
 	if ( fMartialArtist && !Item[usItem].crowbar && this->ubBodyType == REGMALE )
 #else
-	if ( fMartialArtist && !AreInMeanwhile( ) && !Item[usItem].crowbar && this->ubBodyType == REGMALE && !IsZombie( ) ) // SANDRO - added check for body type
+	if ( fMartialArtist && !AreInMeanwhile( ) && !Item[usItem].crowbar && !IsZombie( ) )
 #endif
 	{
 		// Are we in attack mode yet?
@@ -12991,7 +12978,7 @@ void SOLDIERTYPE::EVENT_SoldierBeginKnifeThrowAttack( INT32 sGridNo, UINT8 ubDir
 	DebugAttackBusy( String( "Begin knife throwing attack: ATB  %d\n", gTacticalStatus.ubAttackBusyCount ) );
 
 	// SANDRO - new animation for throwing for big mercs by PasHancock
-	if ( this->ubBodyType == BIGMALE && (DoesMercHavePersonality( this, CHAR_TRAIT_SHOWOFF ) || (HAS_SKILL_TRAIT( this, THROWING_NT ) && gGameOptions.fNewTraitSystem) || (HAS_SKILL_TRAIT( this, THROWING_OT ) && !gGameOptions.fNewTraitSystem)))
+	if ( this->ubBodyType == BIGMALE && (DoesMercHavePersonality( this, CHAR_TRAIT_SHOWOFF ) || traits.HasThrowingSpecialAnimation()))
 	{
 		this->EVENT_InitNewSoldierAnim( THROW_KNIFE_SP_BM, 0, FALSE );
 	}
@@ -13102,7 +13089,7 @@ void SOLDIERTYPE::EVENT_SoldierBeginFirstAid( INT32 sGridNo, UINT8 ubDirection )
 
 		//SANDRO - hack! Find out if we are a doctor with medical bag trying to make a surgery
 		this->fDoingSurgery = FALSE;
-		if ( (NUM_SKILL_TRAITS( this, DOCTOR_NT ) >= gSkillTraitValues.ubDONumberTraitsNeededForSurgery) && Item[this->inv[HANDPOS].usItem].medicalkit && gGameOptions.fNewTraitSystem )
+		if ( traits.HasRequiredNumberOfTraitsNeededForSurgery() && Item[this->inv[HANDPOS].usItem].medicalkit && gGameOptions.fNewTraitSystem )
 		{
 			if ( ((pTSoldier->bTeam == OUR_TEAM) || (pTSoldier->bTeam == MILITIA_TEAM))
 				 && (IS_MERC_BODY_TYPE( pTSoldier ) || IS_CIV_BODY_TYPE( pTSoldier ))
@@ -13266,7 +13253,7 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 	// if we are going to do the surgery
 	// Flugente: AI medics are allowed to perform surgery without first aid kits, and can do this on themselves
 	if ( pVictim->iHealableInjury > 0 && this->fDoingSurgery && (this->ubID != pVictim->ubID || (gGameExternalOptions.fEnemyMedicsHealSelf && this->bTeam == ENEMY_TEAM))
-		 && gGameOptions.fNewTraitSystem && (NUM_SKILL_TRAITS( this, DOCTOR_NT ) >= gSkillTraitValues.ubDONumberTraitsNeededForSurgery)
+		 && traits.HasRequiredNumberOfTraitsNeededForSurgery()
 		 && (Item[this->inv[HANDPOS].usItem].medicalkit || this->bTeam == ENEMY_TEAM) )
 	{
 		fOnSurgery = TRUE;
@@ -13322,10 +13309,9 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 	}
 
 	// Doctor trait improves basic bandaging ability
-	if ( !(fOnSurgery) && gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( this, DOCTOR_NT ) )
+	if ( !(fOnSurgery) && gGameOptions.fNewTraitSystem )
 	{
-		uiPossible = uiPossible * (100 - gSkillTraitValues.bSpeedModifierBandaging) / 100;
-		uiPossible += (uiPossible * gSkillTraitValues.ubDOBandagingSpeedPercent * NUM_SKILL_TRAITS( this, DOCTOR_NT ) + this->GetBackgroundValue( BG_PERC_BANDAGING )) / 100;
+		uiPossible = ( uiPossible * traits.BandagingSpeedFactorInPercent() + this->GetBackgroundValue( BG_PERC_BANDAGING ) ) / 100;
 	}
 
 	uiActual = uiPossible;		// start by assuming maximum possible
@@ -13463,7 +13449,7 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 		// find out if we will repair any stats...
 		if ( NumberOfDamagedStats( pVictim ) > 0 )
 		{
-			usReturnDamagedStatRate = ((gSkillTraitValues.usDORepairStatsRateBasic + gSkillTraitValues.usDORepairStatsRateOnTop * NUM_SKILL_TRAITS( this, DOCTOR_NT )));
+			usReturnDamagedStatRate = ((gSkillTraitValues.usDORepairStatsRateBasic + traits.usDORepairStatsRateOnTop()));
 			usReturnDamagedStatRate -= max( 0, ((usReturnDamagedStatRate * gSkillTraitValues.ubDORepStPenaltyIfAlsoHealing) / 100) );
 
 			// ... in which case, reduce the points
@@ -13476,9 +13462,9 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 		if ( ubPtsLeft >= (pVictim->iHealableInjury / 100) )
 		{
 			if ( this->usSoldierFlagMask2 & SOLDIER_SURGERY_BOOSTED )
-				usLifeReturned = pVictim->iHealableInjury * ( gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentBloodbag + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( this, DOCTOR_NT ) ) / 100;
+				usLifeReturned = pVictim->iHealableInjury * ( gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentBloodbag + traits.ubDOSurgeryHealPercentOnTop() ) / 100;
 			else
-				usLifeReturned = pVictim->iHealableInjury * (gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( this, DOCTOR_NT )) / 100;
+				usLifeReturned = pVictim->iHealableInjury * (gSkillTraitValues.ubDOSurgeryHealPercentBase + traits.ubDOSurgeryHealPercentOnTop()) / 100;
 
 			pVictim->iHealableInjury = 0;
 			//CHRISL: Why would we arbitrarily use all ubPtsLeft when a victim isn't bleeding?  And why would the medical bag, which we have to use in order to 
@@ -13516,9 +13502,9 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 		else
 		{
 			if ( this->usSoldierFlagMask2 & SOLDIER_SURGERY_BOOSTED )
-				usLifeReturned = ubPtsLeft * ( gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentBloodbag + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( this, DOCTOR_NT ) );
+				usLifeReturned = ubPtsLeft * ( gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentBloodbag + traits.ubDOSurgeryHealPercentOnTop() );
 			else
-				usLifeReturned = ubPtsLeft * (gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( this, DOCTOR_NT ));
+				usLifeReturned = ubPtsLeft * (gSkillTraitValues.ubDOSurgeryHealPercentBase + traits.ubDOSurgeryHealPercentOnTop() );
 
 			pVictim->iHealableInjury -= (ubPtsLeft * 100);
 			ubPtsLeft = 0;
@@ -14916,8 +14902,8 @@ INT32 SOLDIERTYPE::GetDamageResistance( BOOLEAN fAutoResolve, BOOLEAN fCalcBreat
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// STOMP traits - Bodybuilding damage resistance
-	if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( this, BODYBUILDING_NT ) )
-		resistance += gSkillTraitValues.ubBBDamageResistance;
+	if ( gGameOptions.fNewTraitSystem)
+		resistance += traits.ubBBDamageResistance();
 	////////////////////////////////////////////////////////////////////////////////////
 
 	// Flugente: drugs can now have an effect on damage resistance
@@ -17094,9 +17080,7 @@ INT8 SOLDIERTYPE::GetTraitCTHModifier( UINT16 usItem, INT16 ubAimTime, UINT8 ubT
 		if ( Item[usItem].rocketlauncher || Item[usItem].singleshotrocketlauncher )
 		{
 			modifier += gSkillTraitValues.bCtHModifierRocketLaunchers; // -25% for untrained mercs !!!
-
-			if ( HAS_SKILL_TRAIT( this, HEAVY_WEAPONS_NT ) )
-				modifier += gSkillTraitValues.ubHWBonusCtHRocketLaunchers * NUM_SKILL_TRAITS( this, HEAVY_WEAPONS_NT ); // +25% per trait
+			modifier += traits.ubHWBonusCtHRocketLaunchers(); // +25% per trait
 		}
 		// Added CtH bonus for Gunslinger trait on pistols and machine-pistols
 		else if ( Weapon[usItem].ubWeaponType == GUN_PISTOL )
@@ -17104,38 +17088,32 @@ INT8 SOLDIERTYPE::GetTraitCTHModifier( UINT16 usItem, INT16 ubAimTime, UINT8 ubT
 			modifier += gSkillTraitValues.bCtHModifierPistols; // -5% for untrained mercs.
 
 			// this bonus is applied only on single shots!
-			if ( HAS_SKILL_TRAIT( this, GUNSLINGER_NT ) && this->bDoBurst == 0 && this->bDoAutofire == 0 )
-				modifier += gSkillTraitValues.ubGSBonusCtHPistols * NUM_SKILL_TRAITS( this, GUNSLINGER_NT ); // +10% per trait
+			if (this->bDoBurst == 0 && this->bDoAutofire == 0 )
+				modifier += traits.ubGSBonusCtHPistols(); // +10% per trait
 		}
 		else if ( Weapon[usItem].ubWeaponType == GUN_M_PISTOL )
 		{
 			modifier += gSkillTraitValues.bCtHModifierMachinePistols; // -5% for untrained mercs.
 
 			// this bonus is applied only on single shots!
-			if ( HAS_SKILL_TRAIT( this, GUNSLINGER_NT ) && ((this->bDoBurst == 0 && this->bDoAutofire == 0) || !gSkillTraitValues.ubGSCtHMPExcludeAuto) )
-				modifier += gSkillTraitValues.ubGSBonusCtHMachinePistols * NUM_SKILL_TRAITS( this, GUNSLINGER_NT ); // +5% per trait
+			if ( (this->bDoBurst == 0 && this->bDoAutofire == 0) || !gSkillTraitValues.ubGSCtHMPExcludeAuto )
+				modifier += traits.ubGSBonusCtHMachinePistols(); // +5% per trait
 		}
 		// Added CtH bonus for Machinegunner skill on assault rifles, SMGs and LMGs
 		else if ( Weapon[usItem].ubWeaponType == GUN_AS_RIFLE )
 		{
 			modifier += gSkillTraitValues.bCtHModifierAssaultRifles; // -5% for untrained mercs.
-
-			if ( HAS_SKILL_TRAIT( this, AUTO_WEAPONS_NT ) )
-				modifier += gSkillTraitValues.ubAWBonusCtHAssaultRifles * NUM_SKILL_TRAITS( this, AUTO_WEAPONS_NT ); // +5% per trait
+			modifier += traits.ubAWBonusCtHAssaultRifles(); // +5% per trait
 		}
 		else if ( Weapon[usItem].ubWeaponType == GUN_SMG )
 		{
 			modifier += gSkillTraitValues.bCtHModifierSMGs; // -5% for untrained mercs.
-
-			if ( HAS_SKILL_TRAIT( this, AUTO_WEAPONS_NT ) )
-				modifier += gSkillTraitValues.ubAWBonusCtHSMGs * NUM_SKILL_TRAITS( this, AUTO_WEAPONS_NT ); // +5% per trait
+			modifier += traits.ubAWBonusCtHSMGs(); // +5% per trait
 		}
 		else if ( Weapon[usItem].ubWeaponType == GUN_LMG )
 		{
 			modifier += gSkillTraitValues.bCtHModifierLMGs; // -10% for untrained mercs.
-
-			if ( HAS_SKILL_TRAIT( this, AUTO_WEAPONS_NT ) )
-				modifier += gSkillTraitValues.ubAWBonusCtHLMGs * NUM_SKILL_TRAITS( this, AUTO_WEAPONS_NT ); // +5% per trait
+			modifier += traits.ubAWBonusCtHLMGs(); // +5% per trait
 		}
 		// Added CtH bonus for Gunslinger trait on pistols and machine-pistols
 		else if ( Weapon[usItem].ubWeaponType == GUN_SN_RIFLE )
@@ -17143,8 +17121,8 @@ INT8 SOLDIERTYPE::GetTraitCTHModifier( UINT16 usItem, INT16 ubAimTime, UINT8 ubT
 			modifier += gSkillTraitValues.bCtHModifierSniperRifles; // -5% for untrained mercs.
 
 			// this bonus is applied only on single shots!
-			if ( HAS_SKILL_TRAIT( this, SNIPER_NT ) && this->bDoBurst == 0 && this->bDoAutofire == 0 )
-				modifier += gSkillTraitValues.ubSNBonusCtHSniperRifles * NUM_SKILL_TRAITS( this, SNIPER_NT ); // +5% per trait
+			if ( this->bDoBurst == 0 && this->bDoAutofire == 0 )
+				modifier += traits.ubSNBonusCtHSniperRifles(); // +5% per trait
 		}
 		// Added CtH bonus for Ranger skill on rifles and shotguns
 		else if ( Weapon[usItem].ubWeaponType == GUN_RIFLE )
@@ -17152,28 +17130,24 @@ INT8 SOLDIERTYPE::GetTraitCTHModifier( UINT16 usItem, INT16 ubAimTime, UINT8 ubT
 			modifier += gSkillTraitValues.bCtHModifierRifles; // -5% for untrained mercs.
 
 			// this bonus is applied only on single shots!
-			if ( HAS_SKILL_TRAIT( this, RANGER_NT ) && this->bDoBurst == 0 && this->bDoAutofire == 0 )
-				modifier += gSkillTraitValues.ubRABonusCtHRifles * NUM_SKILL_TRAITS( this, RANGER_NT ); // +5% per trait
+			if ( this->bDoBurst == 0 && this->bDoAutofire == 0 )
+				modifier += traits.ubRABonusCtHRifles(); // +5% per trait
 			//CHRISL: Why wouldn't sniper training include standard rifles which are often used as "poor-man sniper rifles"
 			// this bonus is applied only on single shots!
-			if ( HAS_SKILL_TRAIT( this, SNIPER_NT ) && this->bDoBurst == 0 && this->bDoAutofire == 0 )
-				modifier += gSkillTraitValues.ubSNBonusCtHRifles * NUM_SKILL_TRAITS( this, SNIPER_NT ); // +5% per trait
+			if ( this->bDoBurst == 0 && this->bDoAutofire == 0 )
+				modifier += traits.ubSNBonusCtHRifles(); // +5% per trait
 		}
 		else if ( Weapon[usItem].ubWeaponType == GUN_SHOTGUN )
 		{
 			modifier += gSkillTraitValues.bCtHModifierShotguns; // -5% for untrained mercs.
-
-			if ( HAS_SKILL_TRAIT( this, RANGER_NT ) )
-				modifier += gSkillTraitValues.ubRABonusCtHShotguns * NUM_SKILL_TRAITS( this, RANGER_NT ); // +10% per trait
+			modifier += traits.ubRABonusCtHShotguns(); // +10% per trait
 		}
 
 		// Added small CtH penalty for robot if controller hasn't the Technician trait
 		if ( AM_A_ROBOT( this ) )
 		{
-			modifier += gSkillTraitValues.bCtHModifierRobot; // -10% 
-
-			if ( HAS_SKILL_TRAIT( this->GetRobotController( ), TECHNICIAN_NT ) )
-				modifier += gSkillTraitValues.ubTECtHControlledRobotBonus * NUM_SKILL_TRAITS( this->GetRobotController( ), TECHNICIAN_NT ); // +10% per trait
+			modifier += gSkillTraitValues.bCtHModifierRobot; // -10%
+			modifier += GetRobotController()->traits.ubTECtHControlledRobotBonus(); // +10% per trait
 		}
 
 		// Added character traits influence
@@ -17806,9 +17780,7 @@ BOOLEAN	SOLDIERTYPE::CanUseSkill( INT8 iSkill, BOOLEAN fAPCheck, INT32 sGridNo )
 
 	case SKILLS_FOCUS:
 		// requires sniper trait, an aimed gun and only works on gridnos in our direction
-		if ( gGameOptions.fNewTraitSystem && 
-			 (HAS_SKILL_TRAIT( this, AUTO_WEAPONS_NT ) || HAS_SKILL_TRAIT( this, HEAVY_WEAPONS_NT ) || HAS_SKILL_TRAIT( this, SNIPER_NT ) || 
-			 HAS_SKILL_TRAIT( this, RANGER_NT ) || HAS_SKILL_TRAIT( this, GUNSLINGER_NT ))
+		if ( traits.HasFocus()
 			 && this->inv[HANDPOS].exists( ) && Item[this->inv[HANDPOS].usItem].usItemClass & (IC_GUN | IC_LAUNCHER) && WeaponReady( this )
 			 && sGridNo != NOWHERE && this->ubDirection == GetDirectionFromGridNo( sGridNo, this ) )
 			canuse = TRUE;
@@ -19444,8 +19416,7 @@ INT16	SOLDIERTYPE::GetDiseaseResistance( )
 	// Flugente: resistance can per definition only be between -100 and 100 (at least that's my definition)
 	INT16 val = 0;
 
-	if ( HAS_SKILL_TRAIT( this, SURVIVAL_NT ) )
-		val += gSkillTraitValues.usSVDiseaseResistance;
+	val += traits.usSVDiseaseResistance();
 
 	val += this->GetBackgroundValue( BG_RESI_DISEASE );
 
@@ -19771,8 +19742,7 @@ UINT8	SOLDIERTYPE::GetWaterSnakeDefenseChance()
 	// base evasion chance is 5%
 	INT16 val = 5;
 
-	if ( gGameOptions.fNewTraitSystem )
-		val += gSkillTraitValues.usSVSnakeDefense * NUM_SKILL_TRAITS( this, SURVIVAL_NT );
+	val += traits.usSVSnakeDefense();
 
 	val += this->GetBackgroundValue( BG_SNAKEDEFENSE );
 
@@ -20193,8 +20163,8 @@ FLOAT		SOLDIERTYPE::GetIntelGain()
 	// 20% snitch trait
 	UINT32 val = 5 * EffectiveWisdom( this )
 		+ 10 * EffectiveExpLevel ( this, FALSE ) 
-		+ 50 * NUM_SKILL_TRAITS( this, SCOUTING_NT ) 
-		+ 75 * NUM_SKILL_TRAITS( this, COVERT_NT ) 
+		+ 50 * NUM_SKILL_TRAITS( this, SCOUTING_NT )
+		+ 75 * NUM_SKILL_TRAITS( this, COVERT_NT )
 		+ 200 * NUM_SKILL_TRAITS( this, SNITCH_NT );
 
 	ReducePointsForFatigue( this, &val );
@@ -21399,16 +21369,8 @@ void SOLDIERTYPE::EVENT_SoldierHandcuffPerson( INT32 sGridNo, UINT8 ubDirection 
 			UINT32 attackrating = 10 * EffectiveExpLevel( this ) + EffectiveStrength( this, FALSE ) + 2 * EffectiveDexterity( this, FALSE ) + EffectiveAgility( this, FALSE );
 			UINT32 defenserating = 10 * EffectiveExpLevel( pSoldier ) + 2 * EffectiveStrength( pSoldier, FALSE ) + 2 * EffectiveDexterity( pSoldier, FALSE ) + 2 * EffectiveAgility( pSoldier, FALSE );
 
-			if ( gGameOptions.fNewTraitSystem )
-			{
-				attackrating += 25 * NUM_SKILL_TRAITS( this, MARTIAL_ARTS_NT ) + 10 * HAS_SKILL_TRAIT( this, MELEE_NT );
-				defenserating += 25 * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ) + 10 * HAS_SKILL_TRAIT( pSoldier, MELEE_NT );
-			}
-			else
-			{
-				attackrating += 25 * NUM_SKILL_TRAITS( this, MARTIALARTS_OT ) + 25 * NUM_SKILL_TRAITS( this, HANDTOHAND_OT ) + 10 * HAS_SKILL_TRAIT( this, KNIFING_OT );
-				defenserating += 25 * NUM_SKILL_TRAITS( pSoldier, MARTIALARTS_OT ) + 25 * NUM_SKILL_TRAITS( pSoldier, HANDTOHAND_OT ) + 10 * HAS_SKILL_TRAIT( pSoldier, KNIFING_OT );
-			}
+			attackrating += traits.HandcuffBonus();
+			defenserating += pSoldier->traits.HandcuffBonus();
 
 			ReducePointsForFatigue( this, &attackrating );
 			ReducePointsForFatigue( pSoldier, &defenserating );
@@ -22928,114 +22890,6 @@ BOOLEAN DoesSoldierWearGasMask( SOLDIERTYPE *pSoldier )//dnl ch40 200909
 	return(FALSE);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SANDRO - added following functions
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOLEAN HAS_SKILL_TRAIT( SOLDIERTYPE * pSoldier, UINT8 uiSkillTraitNumber )
-{
-	if ( pSoldier == NULL )
-		return FALSE;
-
-	// Flugente: compatibility with skills
-	if ( uiSkillTraitNumber == INTEL || uiSkillTraitNumber == VARIOUSSKILLS )
-		return TRUE;
-
-	INT8 bNumMajorTraitsCounted = 0;
-	INT8 bMaxTraits = gSkillTraitValues.ubMaxNumberOfTraits;
-	INT8 bMaxMajorTraits = gSkillTraitValues.ubNumberOfMajorTraitsAllowed;
-
-	// check old/new traits
-	if ( gGameOptions.fNewTraitSystem )
-	{
-		// exception for special merc
-		//if ( gSkillTraitValues.fAllowSpecialMercTraitsException && pSoldier->ubProfile == gSkillTraitValues.ubSpecialMercID)
-		//{
-		//	bMaxTraits++;
-		//	bMaxMajorTraits++;
-		//}
-
-		for ( INT8 bCnt = 0; bCnt < min( 30, bMaxTraits ); ++bCnt )
-		{
-			if ( pSoldier->stats.ubSkillTraits[bCnt] == uiSkillTraitNumber )
-				return(TRUE);
-
-			if ( MajorTrait( pSoldier->stats.ubSkillTraits[bCnt] ) )
-				++bNumMajorTraitsCounted;
-
-			// if we exceeded the allowed number of major traits, ignore the rest of them
-			if ( bNumMajorTraitsCounted > min( 20, bMaxMajorTraits ) )
-				break;
-		}
-	}
-	else
-	{
-		if ( pSoldier->stats.ubSkillTraits[0] == uiSkillTraitNumber )
-			return(TRUE);
-
-		if ( pSoldier->stats.ubSkillTraits[1] == uiSkillTraitNumber )
-			return(TRUE);
-	}
-
-	return(FALSE);
-}
-
-INT8 NUM_SKILL_TRAITS( SOLDIERTYPE * pSoldier, UINT8 uiSkillTraitNumber )
-{
-	if ( pSoldier == NULL )
-		return(0);
-
-	INT8 bNumberOfTraits = 0;
-	INT8 bNumMajorTraitsCounted = 0;
-	INT8 bMaxTraits = gSkillTraitValues.ubMaxNumberOfTraits;
-	INT8 bMaxMajorTraits = gSkillTraitValues.ubNumberOfMajorTraitsAllowed;
-
-	// check old/new traits
-	if ( gGameOptions.fNewTraitSystem )
-	{
-		// exception for special merc
-		//if ( gSkillTraitValues.fAllowSpecialMercTraitsException && pSoldier->ubProfile == gSkillTraitValues.ubSpecialMercID)
-		//{
-		//	bMaxTraits++;
-		//	bMaxMajorTraits++;
-		//}
-
-		for ( INT8 bCnt = 0; bCnt < min( 30, bMaxTraits ); ++bCnt )
-		{
-			if ( pSoldier->stats.ubSkillTraits[bCnt] == uiSkillTraitNumber )
-				++bNumberOfTraits;
-				
-			if ( MajorTrait( pSoldier->stats.ubSkillTraits[bCnt] ) )
-				++bNumMajorTraitsCounted;
-
-			// if we exceeded the allowed number of major traits, ignore the rest of them
-			if ( bNumMajorTraitsCounted > min( 20, bMaxMajorTraits ) )
-				break;
-		}
-
-		// cannot have more than one same minor trait
-		if ( !TwoStagedTrait( uiSkillTraitNumber ) )
-			return (min( 1, bNumberOfTraits ));
-		
-		return (min( 2, bNumberOfTraits ));
-	}
-	else
-	{
-		if ( pSoldier->stats.ubSkillTraits[0] == uiSkillTraitNumber )
-			++bNumberOfTraits;
-
-		if ( pSoldier->stats.ubSkillTraits[1] == uiSkillTraitNumber )
-			++bNumberOfTraits;
-
-		// Electronics, Ambidextrous and Camouflaged can only be of one grade
-		if ( uiSkillTraitNumber == ELECTRONICS_OT ||
-			 uiSkillTraitNumber == AMBIDEXT_OT ||
-			 uiSkillTraitNumber == CAMOUFLAGED_OT )
-			 return (min( 1, bNumberOfTraits ));
-
-		return (bNumberOfTraits);
-	}
-}
-
 UINT8 GetSquadleadersCountInVicinity( SOLDIERTYPE * pSoldier, BOOLEAN fWithHigherLevel, BOOLEAN fDontCheckDistance )
 {
 	UINT8 cnt = 0;
@@ -23573,10 +23427,7 @@ BOOLEAN ResolvePendingInterrupt( SOLDIERTYPE * pSoldier, UINT8 ubInterruptType )
 								(pTeammate->stats.bAgility * 2) +
 								(pTeammate->stats.bWisdom)) / 100);
 							// add bonus per Squadleader trait of the original interrupter
-							if ( HAS_SKILL_TRAIT( pInterrupter, SQUADLEADER_NT ) && gGameOptions.fNewTraitSystem )
-							{
-								usColIntChance += gSkillTraitValues.ubSLCollectiveInterruptsBonus * NUM_SKILL_TRAITS( pInterrupter, SQUADLEADER_NT );
-							}
+							usColIntChance += pInterrupter->traits.ubSLCollectiveInterruptsBonus();
 							if ( PreChance( usColIntChance ) )
 							{
 								ubaInterruptersList[ubInterruptersFound] = pTeammate->ubID;
@@ -23711,51 +23562,6 @@ BOOLEAN DecideAltAnimForBigMerc( SOLDIERTYPE * pSoldier )
 		{
 			return TRUE;
 		}
-	}
-
-	return FALSE;
-}
-
-BOOLEAN TwoStagedTrait( UINT8 uiSkillTraitNumber )
-{
-	if ( gGameOptions.fNewTraitSystem )
-	{
-		if ( uiSkillTraitNumber > 0 )
-		{
-			// covert ops is a major trait that is in a different location
-			if ( uiSkillTraitNumber == COVERT_NT )
-				return TRUE;
-
-			// other traits below NUM_ORIGINAL_MAJOR_TRAITS are all major
-			if ( uiSkillTraitNumber <= NUM_ORIGINAL_MAJOR_TRAITS )
-				return TRUE;
-		}
-	}
-	else
-	{
-		if ( uiSkillTraitNumber == IMP_SKILL_TRAITS__ELECTRONICS ||
-			 uiSkillTraitNumber == IMP_SKILL_TRAITS__AMBIDEXTROUS ||
-			 uiSkillTraitNumber == IMP_SKILL_TRAITS__CAMO )
-			return(FALSE);
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-// determine if this is a major trait (no longer all two-staged)
-BOOLEAN MajorTrait( UINT8 uiSkillTraitNumber )
-{
-	if ( uiSkillTraitNumber > 0 )
-	{
-		// covert ops is a major trait that is in a different location
-		if ( uiSkillTraitNumber == COVERT_NT )
-			return TRUE;
-
-		// other traits below NUM_ORIGINAL_MAJOR_TRAITS are all major
-		if ( uiSkillTraitNumber <= NUM_ORIGINAL_MAJOR_TRAITS )
-			return TRUE;
 	}
 
 	return FALSE;
@@ -24163,10 +23969,9 @@ UINT32 VirtualSoldierDressWound( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pVictim, OB
 		uiPossible += (uiPossible / 2);			// add extra 50 %
 
 	// Doctor trait improves basic bandaging ability
-	if ( !(fOnSurgery) && gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, DOCTOR_NT ) )
+	if ( !(fOnSurgery) && gGameOptions.fNewTraitSystem )
 	{
-		uiPossible = uiPossible * (100 - gSkillTraitValues.bSpeedModifierBandaging) / 100;
-		uiPossible += (uiPossible * gSkillTraitValues.ubDOBandagingSpeedPercent * NUM_SKILL_TRAITS( pSoldier, DOCTOR_NT ) + pSoldier->GetBackgroundValue( BG_PERC_BANDAGING )) / 100;
+		uiPossible = ( uiPossible * pSoldier->traits.BandagingSpeedFactorInPercent() + pSoldier->GetBackgroundValue( BG_PERC_BANDAGING ) ) / 100;
 	}
 
 	uiActual = uiPossible;		// start by assuming maximum possible

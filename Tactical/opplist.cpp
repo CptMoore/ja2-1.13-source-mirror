@@ -1577,20 +1577,7 @@ INT8 DecideHearing( SOLDIERTYPE * pSoldier )
 		bHearing++;
 	}
 
-	// old/new traits check - SANDRO
-	if (gGameOptions.fNewTraitSystem)
-	{
-		if (HAS_SKILL_TRAIT( pSoldier, NIGHT_OPS_NT ))
-			bHearing += gSkillTraitValues.ubNOHearingRangeBonus;
-		if (HAS_SKILL_TRAIT( pSoldier, SNITCH_NT ))
-			bHearing += gSkillTraitValues.ubSNTHearingRangeBonus;
-	}
-	else
-	{
-		if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS_OT ))
-			bHearing += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS_OT );
-	}
-
+	bHearing += pSoldier->traits.HearingBonus();
 	bHearing += pSoldier->GetHearingBonus();
 
 	// adjust for dark conditions
@@ -1609,18 +1596,7 @@ INT8 DecideHearing( SOLDIERTYPE * pSoldier )
 		case 14:
 		case 15:
 			bHearing += 3;
-			// yet another bonus for nighttime
-			// old/new traits check - SANDRO
-			if (gGameOptions.fNewTraitSystem)
-			{
-				if (HAS_SKILL_TRAIT( pSoldier, NIGHT_OPS_NT ))
-					bHearing += gSkillTraitValues.ubNOHearingRangeBonusInDark;
-			}
-			else
-			{
-				if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS_OT ))
-					bHearing += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS_OT );
-			}
+			bHearing += pSoldier->traits.ExtraHearingBonus();
 			break;
 		default:
 			break;

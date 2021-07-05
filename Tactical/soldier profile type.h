@@ -105,84 +105,6 @@ inline bool OKToCheckOpinion(int profileNumber) {
 	return (profileNumber < NUMBER_OF_OPINIONS);
 }
 
-// SANDRO - replaced this list to represent the old traits only
-typedef enum
-{
-	NO_SKILLTRAIT_OT = 0,
-	LOCKPICKING_OT,
-	HANDTOHAND_OT,
-	ELECTRONICS_OT,
-	NIGHTOPS_OT,
-	THROWING_OT,
-	TEACHING_OT,
-	HEAVY_WEAPS_OT,
-	AUTO_WEAPS_OT,
-	STEALTHY_OT,
-	AMBIDEXT_OT,
-	THIEF_OT,
-	MARTIALARTS_OT,
-	KNIFING_OT,
-	PROF_SNIPER_OT,
-	CAMOUFLAGED_OT,
-	// SANDRO - I dared to remove these for it is really useless,
-	//   with the camo removing/repainting feature you only need the basic camouflage trait anyway
-	//CAMOUFLAGED_URBAN,
-	//CAMOUFLAGED_DESERT,
-	//CAMOUFLAGED_SNOW,
-	EXPERT,
-	NUM_SKILLTRAITS_OT
-} SkillTrait;
-
-//////////////////////////////////////////////////////////////////////
-// SANDRO - the list for new traits
-typedef enum
-{
-	NO_SKILLTRAIT_NT = 0,
-	// MAJOR TRAITS
-	AUTO_WEAPONS_NT, // 1
-	HEAVY_WEAPONS_NT, // 2
-	SNIPER_NT, // 3
-	RANGER_NT, // 4
-	GUNSLINGER_NT, // 5
-	MARTIAL_ARTS_NT, // 6
-	SQUADLEADER_NT, // 7
-	TECHNICIAN_NT, // 8
-	DOCTOR_NT, // 9
-	// MINOR TRAITS
-	AMBIDEXTROUS_NT, // 10
-	MELEE_NT, // 11
-	THROWING_NT, // 12
-	NIGHT_OPS_NT, // 13
-	STEALTHY_NT, // 14
-	ATHLETICS_NT, // 15
-	BODYBUILDING_NT, // 16
-	DEMOLITIONS_NT, // 17
-	TEACHING_NT, // 18
-	SCOUTING_NT, // 19
-
-	// Flugente: new traits have to go here, even if they are major traits, as otherwise the existing traits in profiles get mixed up
-	COVERT_NT, // 20	// a major trait
-	RADIO_OPERATOR_NT, //21		// a minor trait
-	SNITCH_NT, //22		// a minor trait 
-	SURVIVAL_NT, //23	// a minor trait
-
-	NUM_SKILLTRAITS_NT
-} SkillTraitNew;
-
-#define NUM_MAJOR_TRAITS 10
-#define NUM_MINOR_TRAITS 13
-
-#define NUM_ORIGINAL_MAJOR_TRAITS 9
-
-// Flugente: I've had it with this hardcoding madness. Without this, adding or removing a new trait would crash anything related to a bubblehelp display of traits
-// always check every use of these enums and every use of the skill-strings if you add a new trait
-#define NEWTRAIT_MERCSKILL_EXPERTOFFSET	(NUM_MAJOR_TRAITS + NUM_MINOR_TRAITS)
-#define NEWTRAIT_MERCSKILL_OFFSET_ALL	(NEWTRAIT_MERCSKILL_EXPERTOFFSET + NUM_MAJOR_TRAITS)
-
-// Flugente: these aren't really traits, but it is convenient to pretend so
-#define INTEL	(2 * NEWTRAIT_MERCSKILL_EXPERTOFFSET + 2)
-#define VARIOUSSKILLS	(INTEL + 1)
-
 // SANDRO - new set of character traits
 typedef enum
 {
@@ -981,6 +903,8 @@ public:
 	std::vector<int>	inv;
 	std::vector<int>	bInvStatus;
 	std::vector<int>	bInvNumber;
+
+	ProfileTraits traits;
 
 	// SANDRO - merc records
 	STRUCT_Records		records;

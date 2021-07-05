@@ -1545,7 +1545,7 @@ void RememberSnitchableEvent( UINT8 ubTargetProfile, UINT8 ubSecondaryTargetProf
 	{
 		ubSnitchProfile = pSnitch->ubProfile;
 		// skip past ourselves and all inactive mercs
-		if ( ProfileHasSkillTrait( ubSnitchProfile, SNITCH_NT ) &&
+		if ( gMercProfiles[ubSnitchProfile].traits.ProfileNTraitLevel( SNITCH_NT ) &&
 			ubSnitchProfile != ubTargetProfile && ubSnitchProfile != ubSecondaryTargetProfile
 			&& pSnitch->bActive && ubSnitchProfile != NO_PROFILE &&
 			!(pSnitch->bAssignment == IN_TRANSIT ||

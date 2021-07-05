@@ -351,7 +351,7 @@ void MercDailyUpdate()
 				}
 			}
 
-			if( !MercThinksHisMoraleIsTooLow( pSoldier ) && ProfileHasSkillTrait( pSoldier->ubProfile, SNITCH_NT ) )
+			if( !MercThinksHisMoraleIsTooLow( pSoldier ) && gMercProfiles[pSoldier->ubProfile].traits.ProfileNTraitLevel( SNITCH_NT ) )
 			{
 				ModifyPlayerReputation( gSkillTraitValues.ubSNTPassiveReputationGain );
 			}

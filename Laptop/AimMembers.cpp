@@ -5410,8 +5410,6 @@ void DisplayPopUpBoxExplainingMercArrivalLocationAndTimeCallBack( UINT8 bExitVal
 
 void DisplayAimMemberClickOnFaceHelpText()
 {
-	CHAR16 sString[ 128 ], sTemp[ 20 ];
-
 	if(gGameExternalOptions.gfUseNewStartingGearInterface)
 	{
 		//display the 'left click' onscreen help msg a bit to the right
@@ -5431,75 +5429,12 @@ void DisplayAimMemberClickOnFaceHelpText()
 	// Buggler: skills/traits tooltip on merc portrait
 	if( gGameExternalOptions.fShowSkillsInHirePage == TRUE )
 	{
+		CHAR16 sString[128];
+
 		// clear string value
-		swprintf( sString, L"");
+		swprintf( sString, L"" );
 
-		if (gGameOptions.fNewTraitSystem) // SANDRO - old/new traits check
-		{
-			UINT8 ubTempSkillArray[30];
-			INT8 bNumSkillTraits = 0;
-
-			// lets rearrange our skills to a temp array
-			// we also get the number of lines (skills) to be displayed 
-			for ( UINT8 ubCnt = 1; ubCnt < NUM_SKILLTRAITS_NT; ubCnt++ )
-			{
-				if ( ProfileHasSkillTrait( gbCurrentSoldier, ubCnt ) == 2 )
-				{
-					ubTempSkillArray[bNumSkillTraits] = (ubCnt + NEWTRAIT_MERCSKILL_EXPERTOFFSET);
-					bNumSkillTraits++;
-				}
-				else if ( ProfileHasSkillTrait( gbCurrentSoldier, ubCnt ) == 1 )
-				{
-					ubTempSkillArray[bNumSkillTraits] = ubCnt;
-					bNumSkillTraits++;
-				}
-			}
-
-			if ( bNumSkillTraits == 0 )
-			{
-				swprintf( sString, L"%s", pPersonnelScreenStrings[ PRSNL_TXT_NOSKILLS ] );
-			}
-			else
-			{
-				for ( UINT8 ubCnt = 0; ubCnt < bNumSkillTraits; ubCnt++ )
-				{
-					swprintf( sTemp, L"%s\n", gzMercSkillTextNew[ ubTempSkillArray[ubCnt] ] );
-					wcscat( sString, sTemp );
-				}
-			}
-		}
-		else
-		{
-			INT8 bSkill1 = 0, bSkill2 = 0; 	
-			bSkill1 = gMercProfiles[ gbCurrentSoldier ].bSkillTraits[0];
-			bSkill2 = gMercProfiles[ gbCurrentSoldier ].bSkillTraits[1];
-
-			if ( bSkill1 == 0 && bSkill2 == 0 )
-			{
-				swprintf( sString, L"%s", pPersonnelScreenStrings[ PRSNL_TXT_NOSKILLS ] );
-			}
-			else
-			{
-				//if the 2 skills are the same, add the '(expert)' at the end
-				if( bSkill1 == bSkill2 )
-				{
-					swprintf( sString, L"%s %s", gzMercSkillText[bSkill1], gzMercSkillText[EXPERT] );
-				}
-				else
-				{
-					//Display the first skill
-					if( bSkill1 != 0 )
-					{
-						swprintf( sString, L"%s\n", gzMercSkillText[bSkill1] );
-					}
-					if( bSkill2 != 0 )
-					{
-						swprintf( sTemp, L"%s", gzMercSkillText[bSkill2] );
-						wcscat( sString, sTemp );
-					}
-				}
-			}
-		}
+		gMercProfiles[gbCurrentSoldier].traits.FillHelpText( sString );
 		SetRegionFastHelpText( &gSelectedFaceRegion, sString );
 	}
 }

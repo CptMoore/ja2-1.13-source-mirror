@@ -2452,7 +2452,7 @@ INT16 MinAPsToShootOrStab(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 bAimTime, 
 		if ( HAS_SKILL_TRAIT( pSoldier, HEAVY_WEAPONS_NT ) && gGameOptions.fNewTraitSystem )
 		{
 //			bAPCost = (INT16)((bAPCost * (100 - gSkillTraitValues.ubHWGrenadeLaunchersAPsReduction * NUM_SKILL_TRAITS( pSoldier, HEAVY_WEAPONS_NT ) ) / 100)+ 0.5); 
-			bAPCost = (INT16)(bAPCost * GetAttackAPTraitMultiplier( pSoldier, pObjUsed, pSoldier->bWeaponMode ) + 0.5f);
+			bAPCost = (INT16)(bAPCost * pSoldier->traits.GetAttackAPMultiplier( pObjUsed, pSoldier->bWeaponMode ) + 0.5f);
 		}
 	}
 	else if ( pSoldier->IsValidSecondHandShot( ) )
@@ -2462,8 +2462,8 @@ INT16 MinAPsToShootOrStab(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 bAimTime, 
 		// SANDRO - gunslinger check for firing speed
 //		if ( HAS_SKILL_TRAIT( pSoldier, GUNSLINGER_NT ) && gGameOptions.fNewTraitSystem )
 //		{
-			INT16 bcst1 = (INT16)(BaseAPsToShootOrStab( bFullAPs, bAimSkill, &(pSoldier->inv[HANDPOS]), pSoldier ) * GetAttackAPTraitMultiplier( pSoldier, pObjUsed, pSoldier->bWeaponMode ) + 0.5f);
-			INT16 bcst2 = (INT16)(BaseAPsToShootOrStab( bFullAPs, bAimSkill, &(pSoldier->inv[SECONDHANDPOS]), pSoldier ) * GetAttackAPTraitMultiplier( pSoldier, pSecondObjUsed, pSoldier->bWeaponMode ) + 0.5f);
+			INT16 bcst1 = (INT16)(BaseAPsToShootOrStab( bFullAPs, bAimSkill, &(pSoldier->inv[HANDPOS]), pSoldier ) * pSoldier->traits.GetAttackAPMultiplier( pObjUsed, pSoldier->bWeaponMode ) + 0.5f);
+			INT16 bcst2 = (INT16)(BaseAPsToShootOrStab( bFullAPs, bAimSkill, &(pSoldier->inv[SECONDHANDPOS]), pSoldier ) * pSoldier->traits.GetAttackAPMultiplier( pSecondObjUsed, pSoldier->bWeaponMode ) + 0.5f);
 //			if ( Weapon[ usItem ].ubWeaponType == GUN_PISTOL )
 //				bcst1 = (INT16)((bcst1 * ( 100 - gSkillTraitValues.ubGSFiringSpeedBonusPistols) / 100)+ 0.5);
 //			if ( Weapon[ pSoldier->inv[SECONDHANDPOS].usItem ].ubWeaponType == GUN_PISTOL ) 
@@ -2501,7 +2501,7 @@ INT16 MinAPsToShootOrStab(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 bAimTime, 
 		if ( gGameOptions.fNewTraitSystem )
 		{
 			// silversurfer: new function to handle all modifiers
-			bAPCost = (INT16)(bAPCost * GetAttackAPTraitMultiplier( pSoldier, pObjUsed, pSoldier->bWeaponMode ) + 0.5f);
+			bAPCost = (INT16)(bAPCost * pSoldier->traits.GetAttackAPMultiplier( pObjUsed, pSoldier->bWeaponMode ) + 0.5f);
 
 /*			// Decreased APs needed for LMG - Auto Weapons
 			if (Weapon[usUBItem].ubWeaponType == GUN_LMG && (pSoldier->bDoBurst || pSoldier->bDoAutofire) && ( HAS_SKILL_TRAIT( pSoldier, AUTO_WEAPONS_NT ) ) )

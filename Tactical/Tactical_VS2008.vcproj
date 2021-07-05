@@ -675,6 +675,10 @@
 				>
 			</File>
 			<File
+				RelativePath="Traits.h"
+				>
+			</File>
+			<File
 				RelativePath="UI Cursors.h"
 				>
 			</File>
@@ -1008,6 +1012,10 @@
 			</File>
 			<File
 				RelativePath="TeamTurns.cpp"
+				>
+			</File>
+			<File
+				RelativePath="Traits.cpp"
 				>
 			</File>
 			<File

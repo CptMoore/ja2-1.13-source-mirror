@@ -1248,26 +1248,7 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 
 					// Are we a martial artist?
 					{
-						BOOLEAN fMartialArtist = FALSE;
-
-						if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubBodyType == REGMALE ) // SANDRO - added check for body type
-						{
-							// SANDRO - old/new traits
-							if (gGameOptions.fNewTraitSystem)
-							{
-								if ( NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ) >= ((gSkillTraitValues.fPermitExtraAnimationsOnlyToMA) ? 2 : 1 ) )
-								{
-									fMartialArtist = TRUE;
-								}
-							}
-							else
-							{
-								if ( ProfileHasSkillTrait( pSoldier->ubProfile, MARTIALARTS_OT ) > 0 )
-								{
-									fMartialArtist = TRUE;
-								}
-							}
-						}
+						BOOLEAN fMartialArtist = pSoldier->traits.HasMartialArtistSpecialAnimation();
 
 						if ( gAnimControl[ pSoldier->usAnimState ].ubHeight == ANIM_CROUCH )
 						{

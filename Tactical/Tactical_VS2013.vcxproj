@@ -106,6 +106,7 @@
     <ClInclude Include="Tactical Save.h" />
     <ClInclude Include="Tactical Turns.h" />
     <ClInclude Include="TeamTurns.h" />
+    <ClInclude Include="Traits.h" />
     <ClInclude Include="UI Cursors.h" />
     <ClInclude Include="Vehicles.h" />
     <ClInclude Include="VehicleMenu.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Tactical Save.cpp" />
     <ClCompile Include="Tactical Turns.cpp" />
     <ClCompile Include="TeamTurns.cpp" />
+    <ClCompile Include="Traits.cpp" />
     <ClCompile Include="Turn Based Input.cpp" />
     <ClCompile Include="UI Cursors.cpp" />
     <ClCompile Include="Vehicles.cpp" />

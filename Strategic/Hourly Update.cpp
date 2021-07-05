@@ -271,6 +271,41 @@ void HandleQuarterHourUpdate()
 	DecayTacticalMoraleModifiers( );
 }
 
+BOOLEAN HandleSnitching( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOtherSoldier ) {
+	// note - snitches stop others, but can get wasted themselves (if they have drug use specifically set in background...)
+	if ( pOtherSoldier
+		&& !pOtherSoldier->flags.fBetweenSectors
+		&& pOtherSoldier->bAssignment != IN_TRANSIT
+		&& pOtherSoldier->bAssignment != ASSIGNMENT_POW
+		&& !SPY_LOCATION( pOtherSoldier->bAssignment )
+		&& pOtherSoldier->bActive
+		&& !pOtherSoldier->flags.fMercAsleep
+		&& pSoldier->ubProfile != pOtherSoldier->ubProfile )
+	{
+		if ( gMercProfiles[pOtherSoldier->ubProfile].traits.ProfileNTraitLevel( SNITCH_NT ) && !( pOtherSoldier->usSoldierFlagMask2 & SOLDIER_PREVENT_MISBEHAVIOUR_OFF ) )
+		{
+			if ( pSoldier->sSectorX == pOtherSoldier->sSectorX && pSoldier->sSectorY == pOtherSoldier->sSectorY && pSoldier->bSectorZ == pOtherSoldier->bSectorZ )
+			{
+				UINT16 bPreventChance = ( EffectiveLeadership( pOtherSoldier ) + EffectiveExpLevel( pOtherSoldier, FALSE ) / 2 );
+				bPreventChance += 25 * pOtherSoldier->traits.SoldierNTraitLevel( SQUADLEADER_NT );
+				bPreventChance -= 25 * pSoldier->traits.StealthLevels();
+
+				// keep 1% chance no matter what
+				bPreventChance = max( 0, min( 99, bPreventChance ) );
+				if ( bPreventChance > PreRandom( 100 ) )
+				{
+					// merc is not amused by being prevented
+					HandleMoraleEvent( pSoldier, MORALE_PREVENTED_MISBEHAVIOUR, pSoldier->sSectorX, pSoldier->sSectorX, pSoldier->bSectorZ );
+					// also here would be a place for dynamic relationship decrease between them
+					// Flugente: then lets do that, shall we?
+					AddOpinionEvent( pSoldier->ubProfile, pOtherSoldier->ubProfile, OPINIONEVENT_SNITCHINTERFERENCE );
+					return TRUE;
+				}
+			}
+		}
+	}
+	return FALSE;
+}
 
 void HourlyQuestUpdate()
 {
@@ -416,38 +451,10 @@ void HourlyLarryUpdate()
 					for( INT32 cnt2 = gTacticalStatus.Team[ OUR_TEAM ].bFirstID; cnt2 <= gTacticalStatus.Team[ OUR_TEAM ].bLastID; ++cnt2 )
 					{					
 						pOtherSoldier = MercPtrs[ cnt2 ];
-						// note - snitches stop others, but can get wasted themselves (if they have drug use specifically set in background...)
-						if( pOtherSoldier && !pOtherSoldier->flags.fBetweenSectors && pOtherSoldier->bActive && !pOtherSoldier->flags.fMercAsleep && pSoldier->ubProfile != pOtherSoldier->ubProfile )
+						if ( HandleSnitching( pSoldier, pOtherSoldier ) )
 						{
-							if (ProfileHasSkillTrait(pOtherSoldier->ubProfile, SNITCH_NT) && !(pOtherSoldier->usSoldierFlagMask2 & SOLDIER_PREVENT_MISBEHAVIOUR_OFF))
-							{
-								if( pSoldier->sSectorX == pOtherSoldier->sSectorX && pSoldier->sSectorY == pOtherSoldier->sSectorY && pSoldier->bSectorZ == pOtherSoldier->bSectorZ )
-								{
-									UINT16 bPreventChance = ( EffectiveLeadership( pOtherSoldier ) + EffectiveExpLevel( pOtherSoldier, FALSE) / 2);
-									if (gGameOptions.fNewTraitSystem)
-									{
-										bPreventChance += 25 * NUM_SKILL_TRAITS( pOtherSoldier, SQUADLEADER_NT );
-										bPreventChance -= 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_NT );
-									}
-									else
-									{
-										bPreventChance -= 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_OT );
-									}
-									// keep 1% chance no matter what
-									bPreventChance = max( 0, min( 99, bPreventChance ) );
-									if( bPreventChance > PreRandom( 100 ) )
-									{
-										// merc is not amused by being prevented
-										HandleMoraleEvent( pSoldier, MORALE_PREVENTED_MISBEHAVIOUR, pSoldier->sSectorX, pSoldier->sSectorX, pSoldier->bSectorZ );
-										// also here would be a place for dynamic relationship decrease between them
-										// Flugente: then lets do that, shall we?
-										AddOpinionEvent( pSoldier->ubProfile, pOtherSoldier->ubProfile, OPINIONEVENT_SNITCHINTERFERENCE );
-
-										fSnitchStoppedBehaviour = TRUE;
-										continue;
-									}
-								}
-							}
+							fSnitchStoppedBehaviour = TRUE;
+							continue; // really continue and not break?
 						}
 					}
 					
@@ -594,39 +601,10 @@ void HourlyDisabilityUpdate( )
 					{
 						pOtherSoldier = MercPtrs[cnt2];
 
-						// note - snitches stop others, but can get wasted themselves (if they have drug use specifically set in background...)
-						if ( pOtherSoldier && !pOtherSoldier->flags.fBetweenSectors && pOtherSoldier->bActive && !pOtherSoldier->flags.fMercAsleep && pSoldier->ubProfile != pOtherSoldier->ubProfile )
+						if ( HandleSnitching( pSoldier, pOtherSoldier ) )
 						{
-							if (ProfileHasSkillTrait(pOtherSoldier->ubProfile, SNITCH_NT) && !(pOtherSoldier->usSoldierFlagMask2 & SOLDIER_PREVENT_MISBEHAVIOUR_OFF))
-							{
-								if ( pSoldier->sSectorX == pOtherSoldier->sSectorX && pSoldier->sSectorY == pOtherSoldier->sSectorY && pSoldier->bSectorZ == pOtherSoldier->bSectorZ )
-								{
-									UINT16 bPreventChance = (EffectiveLeadership( pOtherSoldier ) + EffectiveExpLevel( pOtherSoldier, FALSE) / 2);
-									if ( gGameOptions.fNewTraitSystem )
-									{
-										bPreventChance += 25 * NUM_SKILL_TRAITS( pOtherSoldier, SQUADLEADER_NT );
-										bPreventChance -= 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_NT );
-									}
-									else
-									{
-										bPreventChance -= 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_OT );
-									}
-
-									// keep 1% chance no matter what
-									bPreventChance = max( 0, min( 99, bPreventChance ) );
-									if ( Chance( bPreventChance ) )
-									{
-										// merc is not amused by being prevented
-										HandleMoraleEvent( pSoldier, MORALE_PREVENTED_MISBEHAVIOUR, pSoldier->sSectorX, pSoldier->sSectorX, pSoldier->bSectorZ );
-										// also here would be a place for dynamic relationship decrease between them
-										// Flugente: then lets do that, shall we?
-										AddOpinionEvent( pSoldier->ubProfile, pOtherSoldier->ubProfile, OPINIONEVENT_SNITCHINTERFERENCE );
-
-										fSnitchStoppedBehaviour = TRUE;
-										continue;
-									}
-								}
-							}
+							fSnitchStoppedBehaviour = TRUE;
+							continue; // really continue and not break?
 						}
 					}
 
@@ -719,47 +697,10 @@ void HourlyStealUpdate()
 			{
 				pOtherSoldier = MercPtrs[cnt2];
 
-				// note - snitches stop others, but can scrounge themselves (if they have scrounging specifically set in background...)
-				if ( pOtherSoldier
-					&& !pOtherSoldier->flags.fBetweenSectors
-					&& pOtherSoldier->bAssignment != IN_TRANSIT
-					&& pOtherSoldier->bAssignment != ASSIGNMENT_POW
-					&& !SPY_LOCATION( pOtherSoldier->bAssignment )
-					&& pOtherSoldier->bActive
-					&& !pOtherSoldier->flags.fMercAsleep
-					&& pSoldier->ubProfile != pOtherSoldier->ubProfile )
+				if ( HandleSnitching( pSoldier, pOtherSoldier ) )
 				{
-					if (ProfileHasSkillTrait(pOtherSoldier->ubProfile, SNITCH_NT) && !(pOtherSoldier->usSoldierFlagMask2 & SOLDIER_PREVENT_MISBEHAVIOUR_OFF))
-					{
-						if ( pSoldier->sSectorX == pOtherSoldier->sSectorX && pSoldier->sSectorY == pOtherSoldier->sSectorY && sectorz == pOtherSoldier->bSectorZ )
-						{
-							UINT16 bPreventChance = ( EffectiveLeadership( pOtherSoldier ) + EffectiveExpLevel( pOtherSoldier, FALSE ) / 2 );
-							if ( gGameOptions.fNewTraitSystem )
-							{
-								bPreventChance += 25 * NUM_SKILL_TRAITS( pOtherSoldier, SQUADLEADER_NT );
-								bPreventChance -= 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_NT );
-							}
-							else
-							{
-								bPreventChance -= 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_OT );
-							}
-
-							// keep 1% chance no matter what
-							bPreventChance = max( 0, min( 99, bPreventChance ) );
-							if ( bPreventChance > PreRandom( 100 ) )
-							{
-								// merc is not amused by being prevented
-								HandleMoraleEvent( pSoldier, MORALE_PREVENTED_MISBEHAVIOUR, pSoldier->sSectorX, pSoldier->sSectorX, pSoldier->bSectorZ );
-								// also here would be a place for dynamic relationship decrease between them
-								// Flugente: then lets do that, shall we?
-								AddOpinionEvent( pSoldier->ubProfile, pOtherSoldier->ubProfile, OPINIONEVENT_SNITCHINTERFERENCE );
-
-								fSnitchStoppedBehaviour = TRUE;
-
-								continue;
-							}
-						}
-					}
+					fSnitchStoppedBehaviour = TRUE;
+					continue; // really continue and not break?
 				}
 			}
 

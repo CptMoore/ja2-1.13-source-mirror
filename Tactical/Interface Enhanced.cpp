@@ -8105,7 +8105,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			ubNumLine = 14;
 
 			// Get final Attack Cost
-			INT16 iFinalSingleAPCost = (INT16)(ubAttackAPs * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpItemDescObject, WM_NORMAL ) + 0.5);
+			INT16 iFinalSingleAPCost = (INT16)(ubAttackAPs * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpItemDescObject, WM_NORMAL ) + 0.5);
 
 			// Get base Attack Cost
 			INT16 iSingleAPCost = ubBasicAttackAPs;
@@ -8125,7 +8125,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			else if( !Weapon[gpComparedItemDescObject->usItem].NoSemiAuto )
 			{
 				// Get final Attack Cost
-				INT16 iComparedFinalSingleAPCost = (INT16)(BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier ) * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpItemDescObject, WM_NORMAL ) + 0.5);
+				INT16 iComparedFinalSingleAPCost = (INT16)(BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier ) * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpItemDescObject, WM_NORMAL ) + 0.5);
 				// Get base Attack Cost
 				INT16 iComparedSingleAPCost = BaseAPsToShootOrStabNoModifier( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject );
 				// Get Attack Cost Modifier
@@ -8149,7 +8149,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			// Set line to draw into
 			ubNumLine = 14;
 			// Get final Attack Cost
-			INT16 iFinalSingleAPCost = (INT16)(BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier ) * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpItemDescObject, WM_NORMAL ) + 0.5);
+			INT16 iFinalSingleAPCost = (INT16)(BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier ) * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpItemDescObject, WM_NORMAL ) + 0.5);
 			// Get base Attack Cost
 			INT16 iSingleAPCost = BaseAPsToShootOrStabNoModifier( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject );
 			// Get Attack Cost Modifier
@@ -8169,7 +8169,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			ubNumLine = 15;
 
 			// Get final Burst Cost
-			INT16 iFinalBurstAPCost = (INT16)( (FLOAT)ubAttackAPs * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpItemDescObject, WM_BURST ) + CalcAPsToBurst( APBPConstants[DEFAULT_APS], gpItemDescObject, gpItemDescSoldier ) + 0.5f );
+			INT16 iFinalBurstAPCost = (INT16)( (FLOAT)ubAttackAPs * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpItemDescObject, WM_BURST ) + CalcAPsToBurst( APBPConstants[DEFAULT_APS], gpItemDescObject, gpItemDescSoldier ) + 0.5f );
 
 			// Get base Burst Cost
 			INT16 iBurstAPCost = ubBasicAttackAPs + CalcAPsToBurstNoModifier( APBPConstants[DEFAULT_APS], gpItemDescObject );
@@ -8190,7 +8190,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			{
 				// Get final Burst Cost
 				INT16 iComparedFinalBurstAPCost = (INT16)( (FLOAT)BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier )
-					 * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpComparedItemDescObject, WM_BURST )
+					 * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpComparedItemDescObject, WM_BURST )
 					 + CalcAPsToBurst( APBPConstants[DEFAULT_APS], gpComparedItemDescObject, gpItemDescSoldier ) + 0.5f );
 				// Get base Burst Cost
 				INT16 iComparedBurstAPCost = BaseAPsToShootOrStabNoModifier( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject )
@@ -8216,7 +8216,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			// Set line to draw into
 			ubNumLine = 15;
 			INT16 iFinalBurstAPCost = (INT16)( (FLOAT)BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier )
-				 * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpComparedItemDescObject, WM_BURST )
+				 * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpComparedItemDescObject, WM_BURST )
 				 + CalcAPsToBurst( APBPConstants[DEFAULT_APS], gpComparedItemDescObject, gpItemDescSoldier ) + 0.5f );
 			// Get base Burst Cost
 			INT16 iBurstAPCost = BaseAPsToShootOrStabNoModifier( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject )
@@ -8238,7 +8238,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			ubNumLine = 16;
 
 			// Get final Autofire Cost
-			INT16 iFinalAutoAPCost = (INT16)( (FLOAT)ubAttackAPs * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpItemDescObject, WM_AUTOFIRE ) + CalcAPsToAutofire( APBPConstants[DEFAULT_APS], gpItemDescObject, 3, gpItemDescSoldier ) + 0.5f );
+			INT16 iFinalAutoAPCost = (INT16)( (FLOAT)ubAttackAPs * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpItemDescObject, WM_AUTOFIRE ) + CalcAPsToAutofire( APBPConstants[DEFAULT_APS], gpItemDescObject, 3, gpItemDescSoldier ) + 0.5f );
 
 			// Get base Autofire Cost
 			INT16 iAutoAPCost = ubBasicAttackAPs + CalcAPsToAutofireNoModifier( APBPConstants[DEFAULT_APS], gpItemDescObject, 3 );
@@ -8259,7 +8259,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			{
 				// Get final Autofire Cost
 				INT16 iComparedFinalAutoAPCost = (INT16)( (FLOAT)BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier )
-					 * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpComparedItemDescObject, WM_AUTOFIRE )
+					 * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpComparedItemDescObject, WM_AUTOFIRE )
 					 + CalcAPsToAutofire( APBPConstants[DEFAULT_APS], gpComparedItemDescObject, 3, gpItemDescSoldier ) + 0.5f );
 				// Get base Autofire Cost
 				INT16 iComparedAutoAPCost = BaseAPsToShootOrStabNoModifier( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject )
@@ -8286,7 +8286,7 @@ void DrawWeaponValues( OBJECTTYPE * gpItemDescObject )
 			ubNumLine = 16;
 			// Get final Autofire Cost
 			INT16 iFinalAutoAPCost = (INT16)( (FLOAT)BaseAPsToShootOrStab( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject, gpItemDescSoldier )
-				 * GetAttackAPTraitMultiplier( gpItemDescSoldier, gpComparedItemDescObject, WM_AUTOFIRE )
+				 * gpItemDescSoldier->traits.GetAttackAPMultiplier( gpComparedItemDescObject, WM_AUTOFIRE )
 				 + CalcAPsToAutofire( APBPConstants[DEFAULT_APS], gpComparedItemDescObject, 3, gpItemDescSoldier ) + 0.5f );
 			// Get base Autofire Cost
 			INT16 iAutoAPCost = BaseAPsToShootOrStabNoModifier( APBPConstants[DEFAULT_APS], APBPConstants[DEFAULT_AIMSKILL], gpComparedItemDescObject )
